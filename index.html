@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro Ore Lavoro</title>
+    <style>
+        /* CSS resets and base styles */
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f4f4f9; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 600px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); position: relative; display: flex; flex-direction: column; height: 90vh; }
+        
+        /* Titolo principale */
+        h1#mainTitle { text-align: center; color: #333; font-size: 1.5rem; margin: 0; padding: 10px 0 15px 0; border-bottom: 1px solid #f0f0f0; display: block; }
+        
+        .content-scrollable { flex: 1; overflow-y: auto; padding-bottom: 20px; }
+        button { cursor: pointer; transition: all 0.2s; } button:active { transform: scale(0.98); }
+
+        /* HEADER & GRID */
+        #headerTabella { display: grid; grid-template-columns: 1.8fr 0.6fr 1.4fr 0.5fr; padding: 10px 8px; font-size: 0.85rem; font-weight: bold; color: #555; background: #f8f9fa; border-bottom: 2px solid #ddd; position: sticky; top: 60px; z-index: 20; }
+        .giorno-row { display: grid; grid-template-columns: 1.8fr 0.6fr 1.4fr 0.5fr; align-items: center; gap: 5px; padding: 10px 8px; border-radius: 4px; }
+
+        /* TIMBRATURA BUTTONS */
+        .input-group-ore { display: flex; align-items: center; gap: 4px; }
+        .giorno-input { width: 100%; padding: 8px 0; font-size: 1.1rem; text-align: center; border: 1px solid #ddd; border-radius: 6px; font-family: monospace; }
+        .btn-clock { background: #e9ecef; border: 1px solid #ced4da; border-radius: 6px; padding: 0; width: 34px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: #495057; }
+        .btn-clock:hover { background: #dee2e6; color: #000; }
+        .btn-clock.has-time { background-color: #d4edda; color: #155724; border-color: #c3e6cb; } 
+
+        /* MODALE TIMBRATURA & RIEPILOGO STIPENDI */
+        #timbraturaModal, #riepilogoStipendiModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; }
+        .modal-content { background: white; padding: 20px; border-radius: 12px; width: 95%; max-width: 380px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); max-height: 85vh; overflow-y: auto; }
+        .modal-title { margin: 0 0 15px 0; text-align: center; font-size: 1.2rem; color: #333; }
+        
+        .time-row { display: flex; align-items: center; gap: 5px; margin-bottom: 12px; }
+        .time-label { font-weight: 500; font-size: 0.9rem; color: #555; width: 70px; }
+        .time-input-wrapper { display: flex; align-items: center; flex: 1; gap: 3px; }
+        .time-input { padding: 8px 2px; border: 1px solid #ccc; border-radius: 6px; font-size: 1.1rem; width: 100%; text-align: center; }
+        .btn-now { padding: 0; width: 30px; height: 34px; border: 1px solid #ccc; background: #eee; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+        
+        /* RIEPILOGO ORARI HH:MM */
+        .modal-summary { margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee; font-size: 1rem; color: #444; }
+        .summary-row { display: flex; justify-content: space-between; margin-bottom: 5px; padding: 4px 0; }
+        .summary-val { font-weight: bold; color: #007bff; font-family: monospace; font-size: 1.1rem; }
+        .summary-val.lunch { color: #28a745; } 
+        .summary-val.penalty { color: #dc3545; }
+
+        /* SUGGESTION BOX */
+        .suggestion-box { background-color: #e8f5e9; border: 1px dashed #4caf50; padding: 10px; border-radius: 6px; margin-top: 15px; text-align: center; display: none; }
+        .suggestion-text { font-size: 0.9rem; color: #2e7d32; display: block; margin-bottom: 3px; }
+        .suggestion-time { font-size: 1.4rem; font-weight: bold; color: #1b5e20; font-family: monospace; }
+
+        .btn-modal-save { width: 100%; padding: 12px; background: #28a745; color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; margin-top: 15px; }
+        .btn-modal-close { width: 100%; padding: 10px; background: #6c757d; color: white; border: none; border-radius: 8px; font-size: 1rem; margin-top: 8px; }
+
+        /* STYLE RIEPILOGO STIPENDI */
+        .anno-box { margin-bottom: 20px; border: 1px solid #eee; border-radius: 8px; overflow: hidden; }
+        .anno-header { background: #007bff; color: white; padding: 10px; font-weight: bold; display: flex; justify-content: space-between; }
+        .mese-row-stipendio { display: flex; justify-content: space-between; padding: 8px 10px; border-bottom: 1px solid #f0f0f0; font-size: 0.95rem; }
+        .mese-row-stipendio:last-child { border-bottom: none; }
+        .val-stipendio { font-family: monospace; font-weight: bold; color: #333; }
+
+        /* CONFIGURAZIONE ORARI */
+        .config-input { width: 100px; padding: 8px; font-size: 1.1rem; text-align: center; border: 1px solid #ccc; border-radius: 6px; font-family: monospace; }
+        .config-row { display: flex; justify-content: space-between; padding: 12px 5px; border-bottom: 1px solid #eee; align-items: center; }
+
+        /* ALTRI ELEMENTI */
+        .giorno-previsto { background: transparent; border: none; color: #777; font-weight: 600; text-align: center; }
+        .btn-extra { width: 100%; height: 38px; border: 1px solid #ccc; background: #fff; border-radius: 6px; font-weight: bold; font-size: 1.2rem; color: #666; display: flex; align-items: center; justify-content: center; text-align: center; }
+        .btn-extra.active { background-color: #e3f2fd; color: #0277bd; border-color: #0277bd; font-size: 0.75rem; line-height: 1.1; }
+        .assenze-panel { display: none; padding: 10px; background: #f9f9f9; border-top: 1px dashed #ddd; }
+        .assenze-row { display: flex; gap: 10px; align-items: center; margin-bottom: 5px; }
+        .assenze-select { flex: 2; height: 36px; padding: 0 10px; border-radius: 4px; border: 1px solid #ccc; font-size: 0.95rem; box-sizing: border-box; }
+        .assenze-qty { width: 60px; height: 36px; padding: 5px; border-radius: 4px; border: 1px solid #ccc; text-align: center; box-sizing: border-box; font-size: 1rem; font-family: monospace; }
+        
+        #footerTotali { border-top: 2px solid #ccc; background-color: #343a40; color: white; padding: 10px 15px; display: none; justify-content: space-between; font-size: 0.9rem; border-radius: 0 0 12px 12px; flex-shrink: 0; }
+        .tot-box { text-align: center; }
+        .tot-val { display: block; font-weight: bold; font-size: 1.1rem; margin-bottom: 2px; font-family: monospace; }
+        .tot-label { font-size: 0.75rem; opacity: 0.8; text-transform: uppercase; }
+        
+        #selezionePanel { text-align: center; margin-top: 20px; }
+        select.main-select { font-size: 1.2rem; padding: 8px 20px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #ccc; background-color: #fff; cursor: pointer; width: 80%; }
+        
+        /* NUOVO STILE FILTRI STATISTICHE */
+        .stats-controls { margin-bottom: 20px; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #ddd; }
+        .stats-grid-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .filter-box { display: flex; flex-direction: column; }
+        .filter-label { font-size: 0.8rem; color: #6c757d; margin-bottom: 5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        select.modern-select { width: 100%; padding: 10px; font-size: 1rem; border: 1px solid #ced4da; border-radius: 6px; background-color: white; color: #495057; box-sizing: border-box; }
+
+
+        .mesi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
+        button.btn-mese { padding: 15px; background-color: #007bff; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; position: relative; }
+        button.btn-mese-concluso { background-color: #546e7a; color: #fff; opacity: 0.9; }
+
+        .status-dot { height: 12px; width: 12px; border-radius: 50%; display: inline-block; position: absolute; top: 8px; right: 8px; box-shadow: 0 0 3px rgba(0,0,0,0.3); }
+        .status-paid { background-color: #2ecc71; border: 1px solid #27ae60; } 
+        .status-unpaid { background-color: #bdc3c7; border: 1px solid #7f8c8d; } 
+
+        button.btn-13 { width: 100%; padding: 12px; background-color: #f1c40f; color: #333; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 10px; }
+        button.btn-13.checked { background-color: #27ae60; color: white; }
+        button.btn-stats { width: 100%; padding: 12px; background-color: #6f42c1; color: white; border: none; border-radius: 8px; font-size: 1rem; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        button.btn-config { background-color: #6c757d; padding: 12px; width: 100%; color: white; border: none; border-radius: 8px; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        
+        #schedaMese, #statsPanel, #configPanel, #bustaPanel { display: none; }
+        .scheda-header { display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 25; background-color: white; padding: 15px 0; border-bottom: 1px solid #eee; }
+        .btn-close { background-color: #6c757d; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 0.9rem; }
+        .row-sabato { background-color: #fffde7; } .row-domenica { background-color: #ffebee; } .row-passato { background-color: #eeeeee; opacity: 0.8; }
+        .giorno-label { font-weight: 500; font-size: 1rem; color: #333; }
+        .row-domenica .giorno-label { color: #c62828; font-weight: bold; }
+        .row-sabato .giorno-label { color: #f57f17; font-weight: bold; }
+
+        .stats-result-list { list-style: none; padding: 0; margin: 0; }
+        .stats-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
+        .busta-row { margin-bottom: 15px; } .busta-label { display: block; font-weight: bold; margin-bottom: 5px; color: #555; }
+        .busta-input-group { display: flex; align-items: center; gap: 10px; } .busta-input { flex: 1; padding: 10px; font-size: 1.1rem; border: 1px solid #ccc; border-radius: 6px; text-align: right; }
+        button.btn-busta { margin-top: 10px; padding: 12px; width: 100%; color: white; border: none; border-radius: 8px; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .busta-missing { background-color: #dc3545; animation: pulse 2s infinite; } .busta-ok { background-color: #28a745; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1 id="mainTitle">Registro Ore</h1>
+
+        <div class="content-scrollable">
+            
+            <div id="configPanel">
+                <h3 style="text-align:center; color:#555;">Imposta Orari Obbligatori (HH:MM)</h3>
+                <div id="configContainer">
+                    <div class="config-row" style="background-color:#e3f2fd; border-radius:8px; margin-bottom:15px; border:1px solid #90caf9;">
+                        <span style="font-weight:bold; color:#0d47a1;">Pausa Pranzo Obbligatoria</span>
+                        <input type="time" id="cfg_pausa" class="config-input" value="00:00">
+                    </div>
+                    <div id="daysConfigWrapper"></div>
+                </div>
+                <br>
+                <button class="btn-mese" onclick="salvaConfig()" style="background-color:#28a745; width:100%;">Salva Modifiche</button>
+            </div>
+            
+            <div id="bustaPanel">
+                <h3 style="text-align:center; color:#555;">Dati Busta Paga <span id="bustaMeseTitle"></span></h3>
+                <div class="busta-row"><label class="busta-label">Stipendio Netto (€)</label><input type="number" step="0.01" id="inp_stipendio" class="busta-input" placeholder="0,00" onchange="salvaBusta()"></div>
+                <div id="bustaFeriePermessi">
+                    <div class="busta-row"><label class="busta-label">Residuo Ferie (Ore)</label><div class="busta-input-group"><input type="number" step="0.01" id="inp_ferie_residue" class="busta-input" placeholder="0,00" onkeyup="calcolaConversione(this.value, 'out_ferie')" onchange="salvaBusta()"><span id="out_ferie" class="busta-conversion">-</span></div></div>
+                    <div class="busta-row"><label class="busta-label">Residuo Permessi (Ore)</label><div class="busta-input-group"><input type="number" step="0.01" id="inp_permessi_residue" class="busta-input" placeholder="0,00" onkeyup="calcolaConversione(this.value, 'out_permessi')" onchange="salvaBusta()"><span id="out_permessi" class="busta-conversion">-</span></div></div>
+                </div>
+                <button class="btn-mese" onclick="chiudiBusta()" style="width:100%; margin-top:20px;">Chiudi</button>
+            </div>
+
+            <div id="statsPanel">
+                <div class="scheda-header"><h3 style="margin:0;">📊 Statistiche Assenze</h3><button class="btn-close" onclick="chiudiStats()">Chiudi</button></div>
+                <div class="stats-controls">
+                    <div class="stats-grid-row">
+                        <div class="filter-box">
+                            <span class="filter-label">Anno Riferimento</span>
+                            <select id="statsAnno" class="modern-select" onchange="gestisciAnnoStats(this)"></select>
+                        </div>
+                        <div class="filter-box">
+                            <span class="filter-label">Tipo Assenza</span>
+                            <select id="statsTipo" class="modern-select" onchange="calcolaStats()">
+                                <option value="Ferie">Ferie</option>
+                                <option value="Malattia">Malattia</option>
+                                <option value="Permesso">Permesso</option>
+                                <option value="Festivo">Festivo</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn-mese" onclick="mostraRiepilogoStipendi()" style="margin-top:5px; width:100%; background-color:#17a2b8;">💰 Riepilogo Stipendi</button>
+                </div>
+                <ul id="statsList" class="stats-result-list"></ul>
+                <div id="statsTotal" class="tot-box" style="margin-top:20px; color:#333; font-size:1.2rem;"></div>
+            </div>
+
+            <div id="selezionePanel">
+                <select id="annoSelect" class="main-select" onchange="gestisciAnnoMain(this)"></select>
+                <div class="mesi-grid" id="mesiContainer"></div>
+                <button class="btn-13" id="btn13esima" onclick="apriTredicesima()"><span>🎁 13ª Mensilità</span></button>
+                <button class="btn-stats" onclick="apriStats()">📊 Statistiche</button>
+                <button class="btn-config" onclick="apriConfig()">⚙️ Modifica Orari Obbligatori</button>
+            </div>
+
+            <div id="schedaMese">
+                <div class="scheda-header"><h3 id="titoloMese" style="margin:0;"></h3><button class="btn-close" onclick="chiudiScheda()">Indietro</button></div>
+                <button id="btnBustaMain" class="btn-busta busta-missing" onclick="apriBusta()" style="margin-bottom:15px;">💶 Inserisci Dati Busta Paga</button>
+                <div id="headerTabella"><span>Giorno</span><span style="text-align:center;">Prev.</span><span style="text-align:center;">Fatte</span><span style="text-align:center;">Note</span></div>
+                <div id="giorniContainer"></div>
+            </div>
+        </div>
+
+        <div id="footerTotali">
+            <div class="tot-box"><span class="tot-val" id="totOre">0</span><span class="tot-label">Ore Lav.</span></div>
+            <div class="tot-box" style="color:#ffc107;"><span class="tot-val" id="totPermessi">0</span><span class="tot-label">Permessi</span></div>
+            <div class="tot-box" style="color:#4db6ac;"><span class="tot-val" id="totFerie">0</span><span class="tot-label">Ferie (gg)</span></div>
+            <div class="tot-box" style="color:#e57373;"><span class="tot-val" id="totMalattia">0</span><span class="tot-label">Malattia (gg)</span></div>
+        </div>
+    </div>
+
+    <!-- MODALE TIMBRATURA CON SUGGERIMENTO USCITA -->
+    <div id="timbraturaModal">
+        <div class="modal-content">
+            <h3 class="modal-title">Inserisci Orari</h3>
+            
+            <div class="time-row">
+                <span class="time-label">Mattina</span>
+                <div class="time-input-wrapper">
+                    <input type="time" id="t_in1" class="time-input" onchange="updateSummary()">
+                    <button class="btn-now" onclick="setNow('t_in1')">⏱</button>
+                </div>
+                <div class="time-input-wrapper">
+                    <input type="time" id="t_out1" class="time-input" onchange="updateSummary()">
+                    <button class="btn-now" onclick="setNow('t_out1')">⏱</button>
+                </div>
+            </div>
+
+            <div class="time-row">
+                <span class="time-label">Pomeriggio</span>
+                <div class="time-input-wrapper">
+                    <input type="time" id="t_in2" class="time-input" onchange="updateSummary()">
+                    <button class="btn-now" onclick="setNow('t_in2')">⏱</button>
+                </div>
+                <div class="time-input-wrapper">
+                    <input type="time" id="t_out2" class="time-input" onchange="updateSummary()">
+                    <button class="btn-now" onclick="setNow('t_out2')">⏱</button>
+                </div>
+            </div>
+
+            <!-- BOX SUGGERIMENTO USCITA -->
+            <div id="suggestionBox" class="suggestion-box">
+                <span class="suggestion-text">✨ Per fare le ore previste esci alle:</span>
+                <span id="suggestionTime" class="suggestion-time">--:--</span>
+            </div>
+
+            <div class="modal-summary">
+                <div class="summary-row"><span>Tot. Mattina:</span><span id="sum_mattina" class="summary-val">00:00</span></div>
+                <div class="summary-row"><span>Pausa Pranzo:</span><span id="sum_pranzo" class="summary-val lunch">00:00</span></div>
+                <div class="summary-row" id="row_penalty" style="display:none; color:#dc3545; font-size:0.9rem;">
+                    <span>⚠️ Pausa Minima:</span>
+                    <span id="sum_penalty" class="summary-val penalty" style="font-weight:bold;">-0 min</span>
+                </div>
+                <div class="summary-row"><span>Tot. Pomeriggio:</span><span id="sum_pomeriggio" class="summary-val">00:00</span></div>
+                <div style="margin-top:10px; border-top:1px dashed #ccc; padding-top:5px; text-align:right;">
+                    <span style="font-size:1.1rem; color:#333;">Totale Giornaliero: </span>
+                    <span id="sum_totale_def" style="font-size:1.3rem; font-weight:bold; color:#28a745;">00:00</span>
+                </div>
+            </div>
+
+            <input type="hidden" id="current_edit_key">
+            <input type="hidden" id="current_target_minutes"> <!-- Per salvare le ore previste -->
+            <button class="btn-modal-save" onclick="salvaTimbratura()">Calcola & Salva</button>
+            <button class="btn-modal-close" onclick="chiudiModalTime()">Annulla</button>
+        </div>
+    </div>
+
+    <!-- MODALE RIEPILOGO STIPENDI -->
+    <div id="riepilogoStipendiModal">
+        <div class="modal-content">
+            <h3 class="modal-title" style="border-bottom: 1px solid #eee; padding-bottom:10px;">Riepilogo Stipendi</h3>
+            <div id="containerStipendiList"></div>
+            <button class="btn-modal-close" onclick="chiudiRiepilogoStipendi()">Chiudi</button>
+        </div>
+    </div>
+
+    <script>
+        const nomiMesi = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"];
+        const giorniSett = ["Domenica", "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato"];
+        const DB_KEY = "registro_ore_db";
+        const CONFIG_KEY = "registro_ore_config";
+        const BUSTA_KEY_PREFIX = "busta_paga_"; 
+        const defaultConfig = { 1: "07:00", 2: "07:00", 3: "08:00", 4: "07:00", 5: "07:00", 6: "00:00", 0: "00:00", pausa: "00:00" }; 
+
+        let currentYear = new Date().getFullYear();
+        let currentMonth = 0; 
+        let cachedYears = []; 
+
+        window.onload = function() {
+            popolaAnniTutti(); 
+            generaBottoniMesi(); 
+            refreshTredicesimaStatus();
+            
+            let cfg = localStorage.getItem(CONFIG_KEY);
+            if(!cfg) {
+                localStorage.setItem(CONFIG_KEY, JSON.stringify(defaultConfig));
+            }
+
+            const now = new Date();
+            const thisYear = now.getFullYear();
+            const thisMonth = now.getMonth();
+            const thisDay = now.getDate();
+
+            document.getElementById('annoSelect').value = thisYear;
+            currentYear = thisYear;
+            apriMese(thisMonth);
+            
+            const key = `${thisYear}-${String(thisMonth+1).padStart(2,'0')}-${String(thisDay).padStart(2,'0')}`;
+            apriModalTime(key);
+
+            setTimeout(() => {
+                const row = document.getElementById('input_fatte_' + key);
+                if(row) row.scrollIntoView({block: "center", behavior: "smooth"});
+            }, 300);
+        };
+        
+        function getConfig() { return JSON.parse(localStorage.getItem(CONFIG_KEY)) || defaultConfig; }
+        function getDB() { return JSON.parse(localStorage.getItem(DB_KEY)) || {}; }
+
+        function formatMoney(amount) {
+            let n = parseFloat(amount);
+            if(isNaN(n)) return "€ 0,00";
+            let parts = n.toFixed(2).split('.');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            return "€ " + parts.join(',');
+        }
+
+        /* --- GESTIONE ANNI --- */
+        function getAnniDisponibili() {
+            const db = getDB();
+            const anniSet = new Set();
+            const annoCorrente = new Date().getFullYear();
+            for (let i = annoCorrente - 2; i <= annoCorrente + 2; i++) { anniSet.add(i); }
+            Object.keys(db).forEach(key => { const y = parseInt(key.split('-')[0]); if (!isNaN(y)) anniSet.add(y); });
+            for(let i=0; i<localStorage.length; i++) {
+                let key = localStorage.key(i);
+                if(key.startsWith(BUSTA_KEY_PREFIX)) {
+                    let parts = key.split('_');
+                    if(parts.length >= 3) {
+                        let y = parseInt(parts[2]);
+                        if(!isNaN(y)) anniSet.add(y);
+                    }
+                }
+            }
+            return Array.from(anniSet).sort((a, b) => a - b);
+        }
+
+        function popolaAnniTutti() {
+            const anni = getAnniDisponibili(); cachedYears = anni;
+            riempiSelect(document.getElementById('annoSelect'), anni, currentYear);
+            riempiSelect(document.getElementById('statsAnno'), anni, currentYear);
+        }
+
+        function riempiSelect(selectObj, anni, selectedVal) {
+            selectObj.innerHTML = '';
+            anni.forEach(anno => { let opt = document.createElement('option'); opt.value = anno; opt.innerText = anno; if(anno === selectedVal) opt.selected = true; selectObj.appendChild(opt); });
+            let optNew = document.createElement('option'); optNew.value = "NEW"; optNew.innerText = "➕ Aggiungi Anno..."; optNew.style.fontWeight = "bold"; optNew.style.color = "#007bff"; selectObj.appendChild(optNew);
+        }
+
+        function gestisciAnnoMain(elem) { gestisciAnnoGenerico(elem, () => { currentYear = parseInt(elem.value); refreshTredicesimaStatus(); generaBottoniMesi(); }); }
+        function gestisciAnnoStats(elem) { gestisciAnnoGenerico(elem, () => { calcolaStats(); }); }
+
+        function gestisciAnnoGenerico(elem, callback) {
+            if (elem.value === "NEW") {
+                let nuovoAnno = prompt("Inserisci l'anno da aggiungere (es. 2028):");
+                let annoNum = parseInt(nuovoAnno);
+                if (!isNaN(annoNum) && annoNum > 1900 && annoNum < 2100) {
+                    if(!cachedYears.includes(annoNum)) { cachedYears.push(annoNum); cachedYears.sort((a,b) => a-b); }
+                    riempiSelect(document.getElementById('annoSelect'), cachedYears, annoNum);
+                    riempiSelect(document.getElementById('statsAnno'), cachedYears, annoNum);
+                    if(callback) callback();
+                } else { alert("Anno non valido"); elem.value = currentYear; }
+            } else { if(callback) callback(); }
+        }
+
+        function toggleMainTitle(show) { document.getElementById('mainTitle').style.display = show ? 'block' : 'none'; }
+
+        /* --- RIEPILOGO STIPENDI --- */
+        function mostraRiepilogoStipendi() {
+            const container = document.getElementById('containerStipendiList');
+            container.innerHTML = '';
+            const datiPerAnno = {};
+            const anni = getAnniDisponibili(); 
+            anni.forEach(anno => {
+                let totaleAnno = 0; let mesiTrovati = [];
+                for(let m=0; m<12; m++) {
+                    const key = `${BUSTA_KEY_PREFIX}${anno}_${m}`; const d = JSON.parse(localStorage.getItem(key));
+                    if(d && d.stipendio) { let val = parseFloat(d.stipendio); if(val > 0) { totaleAnno += val; mesiTrovati.push({ idx: m, mese: namesMese(m), val: val }); } }
+                }
+                const key13 = `${BUSTA_KEY_PREFIX}${anno}_12`; const d13 = JSON.parse(localStorage.getItem(key13));
+                if(d13 && d13.stipendio) { let val = parseFloat(d13.stipendio); if(val > 0) { totaleAnno += val; mesiTrovati.push({ idx: 12, mese: "13ª Mensilità", val: val }); } }
+                if(mesiTrovati.length > 0) { mesiTrovati.sort((a,b) => b.idx - a.idx); datiPerAnno[anno] = { tot: totaleAnno, dettagli: mesiTrovati }; }
+            });
+
+            if(Object.keys(datiPerAnno).length === 0) { container.innerHTML = '<div style="text-align:center; padding:20px; color:#999;">Nessuno stipendio registrato.</div>'; } 
+            else {
+                Object.keys(datiPerAnno).sort((a,b) => b-a).forEach(anno => { 
+                    const data = datiPerAnno[anno];
+                    let html = `<div class="anno-box"><div class="anno-header"><span>${anno}</span><span>Tot: ${formatMoney(data.tot)}</span></div><div class="anno-body">`;
+                    data.dettagli.forEach(item => { html += `<div class="mese-row-stipendio"><span>${item.mese}</span><span class="val-stipendio">${formatMoney(item.val)}</span></div>`; });
+                    html += `</div></div>`; container.innerHTML += html;
+                });
+            }
+            document.getElementById('riepilogoStipendiModal').style.display = 'flex';
+        }
+
+        function namesMese(idx) { return nomiMesi[idx]; }
+        function chiudiRiepilogoStipendi() { document.getElementById('riepilogoStipendiModal').style.display = 'none'; }
+
+        /* --- LOGICA TIMBRATURA E PAUSA PRANZO --- */
+        function apriModalTime(chiave) {
+            document.getElementById('current_edit_key').value = chiave;
+            const db = getDB(); const entry = db[chiave];
+            
+            // RESET CAMPI
+            document.getElementById('t_in1').value = ""; document.getElementById('t_out1').value = "";
+            document.getElementById('t_in2').value = ""; document.getElementById('t_out2').value = "";
+            
+            // Carica orari esistenti
+            if (entry && entry.orari) {
+                document.getElementById('t_in1').value = entry.orari.in1 || ""; document.getElementById('t_out1').value = entry.orari.out1 || "";
+                document.getElementById('t_in2').value = entry.orari.in2 || ""; document.getElementById('t_out2').value = entry.orari.out2 || "";
+            }
+
+            // RECUPERA ORE PREVISTE (TARGET)
+            let orePrevisteHHMM = "00:00";
+            if (entry && entry.previste) { 
+                orePrevisteHHMM = entry.previste; // Se salvato
+            } else {
+                // Se non salvato, calcola al volo
+                const [y, m, d] = chiave.split('-');
+                const dateObj = new Date(y, m-1, d);
+                const dayIdx = dateObj.getDay();
+                const cfg = getConfig();
+                orePrevisteHHMM = cfg[dayIdx] || "00:00";
+            }
+            
+            // Salva nel campo hidden per il calcolo suggerimento
+            const targetMin = hhmmToMin(orePrevisteHHMM);
+            document.getElementById('current_target_minutes').value = targetMin;
+
+            updateSummary(); 
+            document.getElementById('timbraturaModal').style.display = 'flex';
+        }
+
+        function setNow(inputId) {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById(inputId).value = `${hours}:${minutes}`;
+            updateSummary(); 
+        }
+
+                function updateSummary() {
+            const in1 = document.getElementById('t_in1').value; const out1 = document.getElementById('t_out1').value;
+            const in2 = document.getElementById('t_in2').value; const out2 = document.getElementById('t_out2').value;
+
+            const minMattina = diffMinuti(in1, out1); 
+            const minPomeriggio = diffMinuti(in2, out2); 
+            const minPranzoReale = diffMinuti(out1, in2); 
+
+            const cfg = getConfig();
+            const pausaObbligatoriaMin = hhmmToMin(cfg.pausa || "00:00");
+
+            // CALCOLO PENALITÀ PAUSA
+            let penaltyMin = 0;
+            if (out1 && in2 && pausaObbligatoriaMin > 0) {
+                if (minPranzoReale < pausaObbligatoriaMin) {
+                    penaltyMin = pausaObbligatoriaMin - minPranzoReale;
+                }
+            }
+
+            // CALCOLO TOTALE
+            const totaleLordo = minMattina + minPomeriggio;
+            const totaleNetto = Math.max(0, totaleLordo - penaltyMin);
+
+            // AGGIORNAMENTO UI TESTUALE
+            document.getElementById('sum_mattina').innerText = minToHHMM(minMattina);
+            document.getElementById('sum_pomeriggio').innerText = minToHHMM(minPomeriggio);
+            document.getElementById('sum_pranzo').innerText = minToHHMM(minPranzoReale);
+            
+            const rowPenalty = document.getElementById('row_penalty');
+            if (penaltyMin > 0) {
+                rowPenalty.style.display = 'flex';
+                document.getElementById('sum_penalty').innerText = `-${penaltyMin} min (fatti ${minPranzoReale} su ${pausaObbligatoriaMin})`;
+            } else {
+                rowPenalty.style.display = 'none';
+            }
+
+            document.getElementById('sum_totale_def').innerText = minToHHMM(totaleNetto);
+
+            // --- LOGICA SUGGERIMENTO USCITA AGGIORNATA ---
+            const suggestionBox = document.getElementById('suggestionBox');
+            const targetMin = parseInt(document.getElementById('current_target_minutes').value) || 0;
+            
+            // Logica di visualizzazione:
+            // 1. Deve esserci un target di ore (> 0)
+            // 2. La mattina deve essere conclusa (in1 e out1)
+            
+            if(targetMin > 0 && in1 && out1) {
+                suggestionBox.style.display = 'block';
+
+                if(!in2) {
+                    // Caso: Manca l'entrata pomeriggio
+                    document.getElementById('suggestionTime').innerText = "Inserisci Rientro Pom...";
+                    document.getElementById('suggestionTime').style.fontSize = "1rem";
+                } else {
+                    // Caso: Abbiamo l'entrata pomeriggio, calcoliamo l'uscita
+                    document.getElementById('suggestionTime').style.fontSize = "1.4rem";
+                    
+                    const fattiMattina = minMattina; 
+                    // Formula: OreTarget - FatteMattina + PenalitàPausa = Quanto devo fare il pomeriggio
+                    const minutiMancantiPomeriggio = targetMin - fattiMattina + penaltyMin;
+
+                    if (minutiMancantiPomeriggio > 0) {
+                        const in2Min = hhmmToMin(in2);
+                        const suggestedExitMin = in2Min + minutiMancantiPomeriggio;
+                        // Mostra orario
+                        document.getElementById('suggestionTime').innerText = minToHHMM(suggestedExitMin);
+                    } else {
+                        // Se minutiMancantiPomeriggio <= 0, vuol dire che ho già fatto le ore la mattina (o target bassissimo)
+                        document.getElementById('suggestionTime').innerText = "Target Raggiunto!";
+                    }
+                }
+            } else {
+                // Non ci sono i dati minimi (Target o Mattina)
+                suggestionBox.style.display = 'none';
+            }
+        }
+
+
+        function diffMinuti(start, end) {
+            if(!start || !end) return 0;
+            const s = start.split(':'); const e = end.split(':');
+            const minStart = parseInt(s[0])*60 + parseInt(s[1]);
+            const minEnd = parseInt(e[0])*60 + parseInt(e[1]);
+            if(minEnd < minStart) return 0; 
+            return (minEnd - minStart);
+        }
+        
+        function minToHHMM(minutes) {
+            if(minutes <= 0) return "00:00";
+            const h = Math.floor(minutes / 60); const m = minutes % 60;
+            // Gestione over 24h non strettamente necessaria qui ma buona prassi
+            return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+        }
+
+        function hhmmToMin(timeStr) {
+            if(!timeStr) return 0;
+            if(timeStr.toString().includes(':')) { const p = timeStr.split(':'); return parseInt(p[0])*60 + parseInt(p[1]); }
+            return parseFloat(timeStr) * 60;
+        }
+
+        function chiudiModalTime() { document.getElementById('timbraturaModal').style.display = 'none'; }
+
+        function salvaTimbratura() {
+            const chiave = document.getElementById('current_edit_key').value;
+            const in1 = document.getElementById('t_in1').value; const out1 = document.getElementById('t_out1').value;
+            const in2 = document.getElementById('t_in2').value; const out2 = document.getElementById('t_out2').value;
+            
+            const minMattina = diffMinuti(in1, out1); 
+            const minPomeriggio = diffMinuti(in2, out2); 
+            const minPranzoReale = diffMinuti(out1, in2);
+            
+            const cfg = getConfig();
+            const pausaObbligatoriaMin = hhmmToMin(cfg.pausa || "00:00");
+            
+            let penaltyMin = 0;
+            if (out1 && in2 && pausaObbligatoriaMin > 0) {
+                if (minPranzoReale < pausaObbligatoriaMin) {
+                    penaltyMin = pausaObbligatoriaMin - minPranzoReale;
+                }
+            }
+
+            const totaleNetto = Math.max(0, (minMattina + minPomeriggio) - penaltyMin);
+            const totaleHHMM = minToHHMM(totaleNetto);
+
+            const db = getDB();
+            let entry = db[chiave] || {}; if(typeof entry !== 'object') entry = { fatte: entry }; 
+            
+            if(totaleNetto > 0 || in1 || out1 || in2 || out2) { 
+                entry.fatte = totaleHHMM; 
+                document.getElementById(`input_fatte_${chiave}`).value = totaleHHMM; 
+            } else {
+                entry.fatte = "";
+                document.getElementById(`input_fatte_${chiave}`).value = "";
+            }
+
+            entry.orari = { in1, out1, in2, out2 };
+            
+            if(entry.previste === undefined) { 
+                let divPrev = document.getElementById(`prev_${chiave}`); 
+                entry.previste = divPrev ? divPrev.innerText : "00:00"; 
+            }
+
+            db[chiave] = entry; 
+            localStorage.setItem(DB_KEY, JSON.stringify(db));
+            
+            chiudiModalTime(); 
+            calcolaTotali();
+        }
+
+        function generGiorni(anno, mese) {
+            const container = document.getElementById('giorniContainer'); container.innerHTML = '';
+            const giorniNelMese = new Date(anno, mese + 1, 0).getDate();
+            const db = getDB(); const cfg = getConfig(); let oggi = new Date(); oggi.setHours(0,0,0,0);
+            for (let i = 1; i <= giorniNelMese; i++) {
+                let dataObj = new Date(anno, mese, i);
+                let nomeGiorno = dataObj.toLocaleDateString('it-IT', { weekday: 'short' });
+                let chiave = `${anno}-${String(mese+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+                let entry = db[chiave]; 
+                let oreFatte = ''; let orePreviste = "00:00"; 
+                let assenzaTipo = ''; let assenzaQty = ''; let hasOrari = false;
+                
+                let dayOfWeek = dataObj.getDay(); 
+                let oreDaConfig = cfg[dayOfWeek] || "00:00"; 
+
+                if (entry) {
+                    if (typeof entry === 'object') {
+                        oreFatte = entry.fatte || ''; 
+                        orePreviste = (entry.previste !== undefined) ? entry.previste : oreDaConfig;
+                        assenzaTipo = entry.assenzaTipo || ''; assenzaQty = entry.assenzaQty || '';
+                        if(entry.orari && (entry.orari.in1 || entry.orari.out1 || entry.orari.in2 || entry.orari.out2)) hasOrari = true;
+                    } else { oreFatte = entry; orePreviste = oreDaConfig; }
+                } else { orePreviste = oreDaConfig; }
+                
+                let classi = ['giorno-row'];
+                if (dayOfWeek === 0) classi.push('row-domenica'); else if (dayOfWeek === 6) classi.push('row-sabato');
+                if (dataObj < oggi) classi.push('row-passato');
+                let btnLabel = "+"; let btnClass = "btn-extra";
+                if(assenzaTipo) { btnClass += " active"; let shortTipo = assenzaTipo.substring(0,3).toUpperCase(); let suffix = (assenzaTipo === 'Permesso') ? 'h' : 'g'; btnLabel = `${shortTipo}<br>${assenzaQty}${suffix}`; }
+                let clockClass = hasOrari ? "btn-clock has-time" : "btn-clock";
+                
+                let html = `
+                    <div class="giorno-wrapper">
+                        <div class="${classi.join(' ')}">
+                            <span class="giorno-label">${i} ${nomeGiorno}</span>
+                            <div class="giorno-previsto" id="prev_${chiave}" data-valore="${orePreviste}">${orePreviste !== "00:00" ? orePreviste : '-'}</div>
+                            <div class="input-group-ore">
+                                <input type="text" class="giorno-input" value="${oreFatte}" onchange="salvaTutto('${chiave}')" id="input_fatte_${chiave}" placeholder="--:--" maxlength="5">
+                                <button class="${clockClass}" onclick="apriModalTime('${chiave}')">🕒</button>
+                            </div>
+                            <button class="${btnClass}" id="btn_extra_${chiave}" onclick="toggleAssenze('${chiave}')">${btnLabel}</button>
+                        </div>
+                        <div class="assenze-panel" id="panel_${chiave}">
+                            <div class="assenze-row">
+                                <select class="assenze-select" id="sel_tipo_${chiave}" onchange="gestisciInputAssenza('${chiave}')">
+                                    <option value="">Nessuna Assenza</option><option value="Ferie" ${assenzaTipo==='Ferie'?'selected':''}>Ferie</option><option value="Malattia" ${assenzaTipo==='Malattia'?'selected':''}>Malattia</option><option value="Permesso" ${assenzaTipo==='Permesso'?'selected':''}>Permesso (HH:MM)</option><option value="Festivo" ${assenzaTipo==='Festivo'?'selected':''}>Festivo</option>
+                                </select>
+                                <input type="text" class="assenze-qty" id="inp_qty_${chiave}" value="${assenzaQty}" placeholder="HH:MM" onkeyup="salvaTutto('${chiave}')" onchange="salvaTutto('${chiave}')" ${assenzaTipo === 'Permesso' ? '' : 'readonly'} maxlength="5">
+                            </div>
+                            <button onclick="confermaAssenza('${chiave}')" style="width:100%; padding:5px; background:#ddd; border:none; border-radius:4px;">Chiudi</button>
+                        </div>
+                    </div>`;
+                container.innerHTML += html;
+            }
+        }
+
+        function toggleAssenze(chiave) { const p = document.getElementById(`panel_${chiave}`); p.style.display = p.style.display === 'block' ? 'none' : 'block'; }
+        function gestisciInputAssenza(chiave) {
+            const tipo = document.getElementById(`sel_tipo_${chiave}`).value; const qtyInput = document.getElementById(`inp_qty_${chiave}`);
+            if (tipo === 'Ferie' || tipo === 'Malattia' || tipo === 'Festivo') { qtyInput.value = 1; qtyInput.readOnly = true; } 
+            else if (tipo === 'Permesso') { qtyInput.readOnly = false; if(qtyInput.value == 1) qtyInput.value = ''; } 
+            else { qtyInput.value = ''; qtyInput.readOnly = true; }
+            salvaTutto(chiave);
+        }
+        function confermaAssenza(chiave) { salvaTutto(chiave); document.getElementById(`panel_${chiave}`).style.display = 'none'; }
+        
+        function salvaTutto(chiave) {
+            const db = getDB();
+            let valFatte = document.getElementById(`input_fatte_${chiave}`).value; let valTipo = document.getElementById(`sel_tipo_${chiave}`).value; let valQty = document.getElementById(`inp_qty_${chiave}`).value;
+            let divPrevisto = document.getElementById(`prev_${chiave}`); let orePrevisteAlMomento = divPrevisto ? divPrevisto.innerText : "00:00"; 
+            if(orePrevisteAlMomento === '-') orePrevisteAlMomento = "00:00";
+            
+            let btn = document.getElementById(`btn_extra_${chiave}`);
+            if(valTipo) { btn.classList.add('active'); let suffix = (valTipo === 'Permesso') ? 'h' : 'g'; let qtyDisplay = valQty !== '' ? valQty : '?'; btn.innerHTML = valTipo.substring(0,3).toUpperCase() + "<br>" + qtyDisplay + suffix; } else { btn.classList.remove('active'); btn.innerHTML = "+"; }
+            let oldEntry = db[chiave] || {}; if(typeof oldEntry !== 'object') oldEntry = {};
+            if (valFatte.trim() === '' && valTipo === '') { if(oldEntry.orari) { db[chiave] = { fatte: '', previste: orePrevisteAlMomento, assenzaTipo: '', assenzaQty: '', orari: oldEntry.orari }; } else { delete db[chiave]; } } else { db[chiave] = { fatte: valFatte, previste: orePrevisteAlMomento, assenzaTipo: valTipo, assenzaQty: valQty, orari: oldEntry.orari }; }
+            localStorage.setItem(DB_KEY, JSON.stringify(db)); calcolaTotali();
+        }
+
+        function calcolaTotali() {
+            const db = getDB(); const giorniNelMese = new Date(currentYear, currentMonth + 1, 0).getDate();
+            let totMinuti = 0; let totPermessiMin = 0; let totFerie = 0; let totMalattia = 0;
+            for (let i = 1; i <= giorniNelMese; i++) {
+                let chiave = `${currentYear}-${String(currentMonth+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`; let entry = db[chiave];
+                if (entry && typeof entry === 'object') { 
+                    if(entry.fatte) totMinuti += hhmmToMin(entry.fatte);
+                    if (entry.assenzaTipo === 'Ferie') { totFerie += parseFloat(entry.assenzaQty) || 0; } 
+                    else if (entry.assenzaTipo === 'Malattia') { totMalattia += parseFloat(entry.assenzaQty) || 0; } 
+                    else if (entry.assenzaTipo === 'Permesso') { totPermessiMin += hhmmToMin(entry.assenzaQty); }
+                }
+            }
+            document.getElementById('totOre').innerText = minToHHMM(totMinuti); document.getElementById('totPermessi').innerText = minToHHMM(totPermessiMin) + "h"; 
+            document.getElementById('totFerie').innerText = totFerie + "g"; document.getElementById('totMalattia').innerText = totMalattia + "g";
+        }
+
+        function apriStats() { toggleMainTitle(false); document.getElementById('selezionePanel').style.display = 'none'; document.getElementById('statsPanel').style.display = 'block'; document.getElementById('footerTotali').style.display = 'none'; document.getElementById('statsAnno').value = currentYear; calcolaStats(); }
+        function chiudiStats() { toggleMainTitle(true); document.getElementById('statsPanel').style.display = 'none'; document.getElementById('selezionePanel').style.display = 'block'; }
+        
+        function calcolaStats() {
+            const anno = document.getElementById('statsAnno').value; const tipo = document.getElementById('statsTipo').value; const list = document.getElementById('statsList'); const totalBox = document.getElementById('statsTotal'); const db = getDB();
+            list.innerHTML = ''; let somma = 0; let count = 0; const chiavi = Object.keys(db).sort();
+            chiavi.forEach(key => { 
+                if (key.startsWith(anno)) { 
+                    const entry = db[key]; 
+                    if (entry && typeof entry === 'object' && entry.assenzaTipo === tipo) { 
+                        let val = 0; let valDisplay = "";
+                        if(tipo === 'Permesso') { val = hhmmToMin(entry.assenzaQty); valDisplay = entry.assenzaQty + " h"; } else { val = parseFloat(entry.assenzaQty) || 0; valDisplay = val + ((val > 1) ? ' gg' : ' giorno'); }
+                        somma += val; count++; 
+                        const [y, m, d] = key.split('-'); const dateObj = new Date(y, m-1, d); const dataStr = dateObj.toLocaleDateString('it-IT', { day: 'numeric', month: 'long', weekday: 'short' }); 
+                        list.innerHTML += `<li class="stats-item"><span class="stats-date">${dataStr}</span><span class="stats-val">${valDisplay}</span></li>`; 
+                    } 
+                } 
+            });
+            if (count === 0) { list.innerHTML = '<li style="text-align:center; padding:20px; color:#999;">Nessun dato trovato</li>'; totalBox.innerText = `Totale: 0`; } else { if(tipo === 'Permesso') { totalBox.innerText = `Totale: ${minToHHMM(somma)} Ore`; } else { totalBox.innerText = `Totale: ${somma} Giorni`; } }
+        }
+
+        function apriTredicesima() { toggleMainTitle(false); currentYear = document.getElementById('annoSelect').value; currentMonth = 12; document.getElementById('selezionePanel').style.display = 'none'; document.getElementById('bustaPanel').style.display = 'block'; document.getElementById('bustaMeseTitle').innerText = `(13ª Mensilità ${currentYear})`; document.getElementById('bustaFeriePermessi').style.display = 'none'; const key = `${BUSTA_KEY_PREFIX}${currentYear}_12`; const dati = JSON.parse(localStorage.getItem(key)) || {}; document.getElementById('inp_stipendio').value = dati.stipendio || ''; }
+        function refreshTredicesimaStatus() { let y = document.getElementById('annoSelect').value; const key = `${BUSTA_KEY_PREFIX}${y}_12`; const dati = JSON.parse(localStorage.getItem(key)); const btn = document.getElementById('btn13esima'); if (dati && dati.stipendio && parseFloat(dati.stipendio) > 0) { btn.classList.add('checked'); btn.innerHTML = `✅ 13ª: ${formatMoney(parseFloat(dati.stipendio))}`; } else { btn.classList.remove('checked'); btn.innerHTML = `🎁 13ª Mensilità`; } }
+        function checkBustaStatus() { if(currentMonth === 12) return; const key = `${BUSTA_KEY_PREFIX}${currentYear}_${currentMonth}`; const dati = JSON.parse(localStorage.getItem(key)); const btn = document.getElementById('btnBustaMain'); if (dati && dati.stipendio && parseFloat(dati.stipendio) > 0) { btn.className = "btn-busta busta-ok"; btn.innerHTML = `✅ Busta: ${formatMoney(parseFloat(dati.stipendio))}`; } else { btn.className = "btn-busta busta-missing"; btn.innerHTML = "💶 Inserisci Dati Busta Paga"; } }
+        function apriBusta() { document.getElementById('schedaMese').style.display = 'none'; document.getElementById('bustaPanel').style.display = 'block'; document.getElementById('bustaMeseTitle').innerText = `(${nomiMesi[currentMonth]} ${currentYear})`; document.getElementById('bustaFeriePermessi').style.display = 'block'; const key = `${BUSTA_KEY_PREFIX}${currentYear}_${currentMonth}`; const dati = JSON.parse(localStorage.getItem(key)) || {}; document.getElementById('inp_stipendio').value = dati.stipendio || ''; document.getElementById('inp_ferie_residue').value = dati.ferie || ''; document.getElementById('inp_permessi_residue').value = dati.permessi || ''; calcolaConversione(dati.ferie || 0, 'out_ferie'); calcolaConversione(dati.permessi || 0, 'out_permessi'); }
+        function chiudiBusta() { 
+            document.getElementById('bustaPanel').style.display = 'none'; 
+            if(currentMonth === 12) { toggleMainTitle(true); document.getElementById('selezionePanel').style.display = 'block'; refreshTredicesimaStatus(); } 
+            else { document.getElementById('schedaMese').style.display = 'block'; checkBustaStatus(); } 
+            generaBottoniMesi();
+        }
+        function salvaBusta() { const stip = document.getElementById('inp_stipendio').value; const ferie = document.getElementById('inp_ferie_residue').value; const perm = document.getElementById('inp_permessi_residue').value; const dati = { stipendio: stip, ferie: ferie, permessi: perm }; const key = `${BUSTA_KEY_PREFIX}${currentYear}_${currentMonth}`; localStorage.setItem(key, JSON.stringify(dati)); }
+        function calcolaConversione(oreInput, outputId) { let ore = parseFloat(oreInput) || 0; let giorni = Math.floor(ore / 8); let oreRestanti = (ore % 8).toFixed(2); let testo = "-"; if(ore > 0) testo = `${giorni} GG e ${oreRestanti} h`; document.getElementById(outputId).innerText = testo; }
+        
+        function apriConfig() { 
+            toggleMainTitle(false); document.getElementById('selezionePanel').style.display = 'none'; document.getElementById('configPanel').style.display = 'block'; document.getElementById('footerTotali').style.display = 'none'; 
+            const cfg = getConfig(); 
+            // Pausa
+            document.getElementById('cfg_pausa').value = cfg.pausa || "00:00";
+            // Giorni
+            const container = document.getElementById('daysConfigWrapper'); container.innerHTML = ''; 
+            [1, 2, 3, 4, 5, 6, 0].forEach(dayIdx => { container.innerHTML += `<div class="config-row"><span>${giorniSett[dayIdx]}</span><input type="time" id="cfg_day_${dayIdx}" class="config-input" value="${cfg[dayIdx] || '00:00'}"></div>`; }); 
+        }
+        
+        function salvaConfig() { 
+            const newConfig = {}; 
+            [0,1,2,3,4,5,6].forEach(i => newConfig[i] = document.getElementById(`cfg_day_${i}`).value || "00:00"); 
+            newConfig.pausa = document.getElementById('cfg_pausa').value || "00:00";
+            localStorage.setItem(CONFIG_KEY, JSON.stringify(newConfig)); 
+            document.getElementById('configPanel').style.display = 'none'; document.getElementById('selezionePanel').style.display = 'block'; toggleMainTitle(true); 
+        }
+        
+        function generaBottoniMesi() { 
+            const container = document.getElementById('mesiContainer'); container.innerHTML = ''; 
+            const now = new Date(); const realYear = now.getFullYear(); const realMonth = now.getMonth(); 
+            const selectedYear = parseInt(document.getElementById('annoSelect').value);
+            nomiMesi.forEach((nome, index) => { 
+                let btn = document.createElement('button'); btn.className = 'btn-mese'; 
+                if (selectedYear < realYear) { btn.classList.add('btn-mese-concluso'); }
+                else if (selectedYear === realYear && index < realMonth) { btn.classList.add('btn-mese-concluso'); }
+                const key = `${BUSTA_KEY_PREFIX}${selectedYear}_${index}`; const dati = JSON.parse(localStorage.getItem(key));
+                let statusClass = 'status-unpaid'; 
+                if (dati && dati.stipendio && parseFloat(dati.stipendio) > 0) { statusClass = 'status-paid'; }
+                btn.innerHTML = `${nome}<span class="status-dot ${statusClass}"></span>`;
+                btn.onclick = () => apriMese(index); container.appendChild(btn); 
+            }); 
+        }
+
+        function apriMese(meseIndex) { toggleMainTitle(false); currentYear = document.getElementById('annoSelect').value; currentMonth = meseIndex; document.getElementById('selezionePanel').style.display = 'none'; document.getElementById('schedaMese').style.display = 'block'; document.getElementById('footerTotali').style.display = 'flex'; document.getElementById('titoloMese').innerText = `${nomiMesi[meseIndex]} ${currentYear}`; generGiorni(currentYear, meseIndex); calcolaTotali(); checkBustaStatus(); }
+        function chiudiScheda() { toggleMainTitle(true); document.getElementById('schedaMese').style.display = 'none'; document.getElementById('footerTotali').style.display = 'none'; document.getElementById('selezionePanel').style.display = 'block'; refreshTredicesimaStatus(); generaBottoniMesi(); }
+    </script>
+</body>
+</html>
