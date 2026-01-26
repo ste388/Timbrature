@@ -84,6 +84,83 @@
         button.btn-busta { margin-top: 10px; padding: 12px; width: 100%; color: white; border: none; border-radius: 8px; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .busta-missing { background-color: #dc3545; animation: pulse 2s infinite; } .busta-ok { background-color: #28a745; }
         #loadingOverlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.9); z-index:9999; display:flex; justify-content:center; align-items:center; flex-direction:column; font-weight:bold; color:#007bff; }
+		
+		
+		/* --- STILE MOBILE OTTIMIZZATO --- */
+@media screen and (max-width: 768px) {
+    
+    /* 1. RIDUCIAMO IL CONTENITORE PRINCIPALE */
+    .container {
+        padding: 5px; /* Meno bordo bianco */
+        width: 100%;
+        max-width: 100%;
+        box-shadow: none; /* Togliamo l'ombra per guadagnare pixel */
+    }
+
+    /* 2. TABELLA GIORNI PIÙ COMPATTA */
+    /* Riduciamo il font e lo spazio interno delle righe */
+    .giorno-row {
+        padding: 8px 4px; /* Meno padding laterale */
+        font-size: 0.85rem; /* Testo più piccolo */
+        gap: 5px; /* Meno spazio tra gli elementi */
+    }
+
+    /* 3. COLONNA DATA */
+    .giorno-label {
+        width: 35px; /* Fissa larghezza minima */
+        font-size: 0.75rem; /* Data piccolina */
+        line-height: 1.1; /* Righe vicine */
+        white-space: normal; /* Permetti a capo se serve */
+    }
+
+    /* 4. COLONNA "PREVISTE" */
+    /* Spesso inutile su mobile, la rimpiccioliamo o nascondiamo se vuoi */
+    .giorno-previsto {
+        font-size: 0.7rem;
+        color: #999;
+        width: 35px; 
+    }
+
+    /* 5. INPUT ORE (Il colpevole principale) */
+    .input-group-ore {
+        flex-grow: 1; /* Prende tutto lo spazio disponibile */
+        gap: 2px;
+    }
+
+    .giorno-input {
+        width: 50px !important; /* Forza larghezza fissa */
+        padding: 5px 2px;
+        font-size: 0.9rem;
+        text-align: center;
+    }
+    
+    /* Tasto Orologio più compatto */
+    .btn-clock {
+        padding: 5px 8px;
+        font-size: 1rem;
+    }
+
+    /* 6. BOTTONE ASSENZE (Quello che sballa coi permessi) */
+    .btn-extra {
+        width: 45px; /* Larghezza fissa per non spaccare la riga */
+        height: 34px;
+        font-size: 0.7rem; /* Testo piccolissimo per far stare "PERMESSO" */
+        padding: 2px;
+        line-height: 1;
+        overflow: hidden; /* Se sfora, taglia invece di allargare */
+        white-space: normal; /* Permetti "PERM<br>2h" */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+    
+    /* Se c'è testo lungo come "Permesso", usiamo abbreviazioni via CSS */
+    /* Nota: Questo richiede modifiche al JS se vuoi farlo perfetto, 
+       ma intanto il CSS overflow:hidden impedisce che spacchi tutto */
+}
+
+		
     </style>
 </head>
 <body>
@@ -126,9 +203,16 @@
                     </div>
                     <div id="daysConfigWrapper"></div>
                 </div>
+                
                 <br>
-                <button class="btn-mese" onclick="salvaConfig()" style="background-color:#28a745; width:100%;">Salva Modifiche</button>
+                
+                <!-- PULSANTIERA -->
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    <button class="btn-mese" onclick="salvaConfig()" style="background-color:#28a745; width:100%;">💾 Salva Modifiche</button>
+                    <button class="btn-mese" onclick="chiudiConfig()" style="background-color:#6c757d; width:100%;">⬅️ Indietro</button>
+                </div>
             </div>
+
             
             <div id="bustaPanel">
                 <h3 style="text-align:center; color:#555;">Dati Busta Paga <span id="bustaMeseTitle"></span></h3>
@@ -260,7 +344,7 @@
     // --- FINE PRIMA PARTE ---
 
 
-        window.salvaConfig = salvaConfig; window.chiudiBusta = chiudiBusta; window.salvaBusta = salvaBusta; window.calcolaConversione = calcolaConversione;
+        window.salvaConfig = salvaConfig; window.salvaBusta = salvaBusta; window.calcolaConversione = calcolaConversione;
         window.mostraRiepilogoStipendi = mostraRiepilogoStipendi; window.chiudiRiepilogoStipendi = chiudiRiepilogoStipendi;
         window.apriTredicesima = apriTredicesima; window.apriStats = apriStats; window.chiudiStats = chiudiStats;
         window.apriConfig = apriConfig; window.gestisciAnnoMain = gestisciAnnoMain; window.gestisciAnnoStats = gestisciAnnoStats;
@@ -672,13 +756,55 @@ async function saveConfigData(newCfg) {
         function refreshTredicesimaStatus() { const d = globalBuste[`${document.getElementById('annoSelect').value}_12`]; const b = document.getElementById('btn13esima'); if(d?.stipendio) { b.classList.add('checked'); b.innerHTML=`✅ 13ª: ${formatMoney(d.stipendio)}`; } else { b.classList.remove('checked'); b.innerHTML=`🎁 13ª Mensilità`; } }
         function checkBustaStatus() { if(currentMonth===12) return; const d = globalBuste[`${currentYear}_${currentMonth}`]; const b=document.getElementById('btnBustaMain'); if(d?.stipendio) { b.className="btn-busta busta-ok"; b.innerHTML=`✅ Busta: ${formatMoney(d.stipendio)}`; } else { b.className="btn-busta busta-missing"; b.innerHTML="💶 Inserisci Dati Busta Paga"; } }
         function apriBusta() { document.getElementById('schedaMese').style.display='none'; document.getElementById('bustaPanel').style.display='block'; document.getElementById('bustaMeseTitle').innerText=`(${nomiMesi[currentMonth]})`; document.getElementById('bustaFeriePermessi').style.display='block'; const d = globalBuste[`${currentYear}_${currentMonth}`]||{}; document.getElementById('inp_stipendio').value=d.stipendio||''; document.getElementById('inp_ferie_residue').value=d.ferie||''; document.getElementById('inp_permessi_residue').value=d.permessi||''; calcolaConversione(d.ferie,'out_ferie'); calcolaConversione(d.permessi,'out_permessi'); }
-        function chiudiBusta() { document.getElementById('bustaPanel').style.display='none'; if(currentMonth===12) { toggleMainTitle(true); document.getElementById('selezionePanel').style.display='block'; refreshTredicesimaStatus(); } else { document.getElementById('schedaMese').style.display='block'; checkBustaStatus(); } generaBottoniMesi(); }
-        async function salvaBusta() { const s=document.getElementById('inp_stipendio').value, f=document.getElementById('inp_ferie_residue').value, p=document.getElementById('inp_permessi_residue').value; const k = `${currentYear}_${currentMonth===undefined?12:currentMonth}`; await saveBustaEntry(k, {stipendio:s, ferie:f, permessi:p}); }
+
+
+        async function salvaBusta() { 
+    const s = document.getElementById('inp_stipendio').value;
+    const f = document.getElementById('inp_ferie_residue').value;
+    const p = document.getElementById('inp_permessi_residue').value; 
+    
+    // Nota: currentMonth potrebbe essere 0 (Gennaio), quindi controlliamo se è undefined, non se è falsey
+    const meseKey = (currentMonth === undefined || currentMonth === null) ? 12 : currentMonth;
+    const k = `${currentYear}_${meseKey}`; 
+    
+    await saveBustaEntry(k, {stipendio:s, ferie:f, permessi:p});
+    
+    // Chiudi e torna al menu
+    alert("Dati Busta salvati!");
+    chiudiBusta(); 
+}
+
         function calcolaConversione(v, id) { let o=parseFloat(v)||0; document.getElementById(id).innerText = o>0 ? `${Math.floor(o/8)}g ${(o%8).toFixed(2)}h` : "-"; }
         
         function apriConfig() { toggleMainTitle(false); document.getElementById('selezionePanel').style.display='none'; document.getElementById('configPanel').style.display='block'; document.getElementById('cfg_pausa').value=globalConfig.pausa||"00:00"; const c=document.getElementById('daysConfigWrapper'); c.innerHTML=''; [1,2,3,4,5,6,0].forEach(d=>{ c.innerHTML+=`<div class="config-row"><span>${giorniSett[d]}</span><input type="time" id="cfg_day_${d}" class="config-input" value="${globalConfig[d]||'00:00'}"></div>`; }); }
         async function salvaConfig() { const n={}; [0,1,2,3,4,5,6].forEach(i=>n[i]=document.getElementById(`cfg_day_${i}`).value); n.pausa=document.getElementById('cfg_pausa').value; await saveConfigData(n); document.getElementById('configPanel').style.display='none'; document.getElementById('selezionePanel').style.display='block'; toggleMainTitle(true); }
         
+		function chiudiConfig() {
+    // Nascondi la modale/pannello config
+    document.getElementById('configModal').style.display = 'none';
+    // Opzionale: Ricarica i dati per annullare eventuali modifiche non salvate
+    // syncAllData(); // Solo se vuoi "annullare" le modifiche fatte prima di premere Salva
+}
+		window.chiudiConfig = function() {
+    // 1. Nascondi Config
+    const pConfig = document.getElementById('configPanel');
+    if(pConfig) pConfig.style.display = 'none';
+
+    // 2. Mostra Menu Principale
+    const pSel = document.getElementById('selezionePanel');
+    if(pSel) pSel.style.display = 'block';
+
+    // 3. Ripristina titolo (se serve)
+    // const title = document.getElementById('mainTitle');
+    // if(title) title.style.display = 'block';
+
+    // Scroll in cima per pulizia
+    window.scrollTo(0,0);
+};
+
+		
+		
+		
         function generaBottoniMesi() { const c=document.getElementById('mesiContainer'); c.innerHTML=''; const now=new Date(), ry=now.getFullYear(), rm=now.getMonth(), sy=parseInt(document.getElementById('annoSelect').value); nomiMesi.forEach((m,i)=>{ let b=document.createElement('button'); b.className='btn-mese'; if(sy<ry || (sy===ry && i<rm)) b.classList.add('btn-mese-concluso'); const d=globalBuste[`${sy}_${i}`]; let st='status-unpaid'; if(d?.stipendio) st='status-paid'; b.innerHTML=`${m}<span class="status-dot ${st}"></span>`; b.onclick=()=>apriMese(i); c.appendChild(b); }); }
         function apriMese(i) { toggleMainTitle(false); currentMonth=i; document.getElementById('selezionePanel').style.display='none'; document.getElementById('schedaMese').style.display='block'; document.getElementById('footerTotali').style.display='flex'; document.getElementById('titoloMese').innerText=`${nomiMesi[i]} ${currentYear}`; generGiorni(currentYear,i); calcolaTotali(); checkBustaStatus(); }
         function chiudiScheda() { toggleMainTitle(true); document.getElementById('schedaMese').style.display='none'; document.getElementById('footerTotali').style.display='none'; document.getElementById('selezionePanel').style.display='block'; refreshTredicesimaStatus(); generaBottoniMesi(); }
@@ -686,6 +812,78 @@ async function saveConfigData(newCfg) {
         function apriStats() { toggleMainTitle(false); document.getElementById('selezionePanel').style.display='none'; document.getElementById('statsPanel').style.display='block'; document.getElementById('statsAnno').value=currentYear; calcolaStats(); }
         function chiudiStats() { toggleMainTitle(true); document.getElementById('statsPanel').style.display='none'; document.getElementById('selezionePanel').style.display='block'; }
         function calcolaStats() { const a=document.getElementById('statsAnno').value, t=document.getElementById('statsTipo').value, l=document.getElementById('statsList'), tb=document.getElementById('statsTotal'); l.innerHTML=''; let s=0, c=0; Object.keys(globalDB).sort().forEach(k=>{ if(k.startsWith(a)){ const e=globalDB[k]; if(e.assenzaTipo===t){ let v=0,vd=""; if(t==='Permesso'){v=hhmmToMin(e.assenzaQty); vd=e.assenzaQty+"h";} else {v=parseFloat(e.assenzaQty)||0; vd=v+(v>1?'gg':'g');} s+=v; c++; const d=new Date(k); l.innerHTML+=`<li class="stats-item"><span>${d.toLocaleDateString('it-IT',{day:'numeric',month:'long'})}</span><b>${vd}</b></li>`; } } }); if(c===0) {l.innerHTML='<li style="text-align:center;padding:20px;">Nessun dato</li>'; tb.innerText="Totale: 0";} else tb.innerText=`Totale: ${t==='Permesso'?minToHHMM(s)+' Ore':s+' Giorni'}`; }
+
+       window.chiudiBusta = function() { 
+    // Nascondi pannello busta
+    document.getElementById('bustaPanel').style.display = 'none'; 
+    
+    // Nascondi anche la scheda del mese (se fosse aperta sotto)
+    document.getElementById('schedaMese').style.display = 'none';
+    document.getElementById('footerTotali').style.display = 'none';
+
+    // Mostra SEMPRE il menu principale
+    toggleMainTitle(true); 
+    document.getElementById('selezionePanel').style.display = 'block'; 
+    
+    // Aggiorna i pallini e i bottoni
+    refreshTredicesimaStatus(); 
+    generaBottoniMesi(); 
+}
+
+// =========================================================
+//  FUNZIONI GLOBALI (Da mettere alla FINE dello script)
+// =========================================================
+
+// Funzione Chiudi Busta (Aggiornata e sicura)
+window.chiudiBusta = function() { 
+    console.log("Eseguo chiudiBusta...");
+    const pBusta = document.getElementById('bustaPanel');
+    const pMese = document.getElementById('schedaMese');
+    const pFooter = document.getElementById('footerTotali');
+
+    if(pBusta) pBusta.style.display = 'none';
+    if(pMese) pMese.style.display = 'none';
+    if(pFooter) pFooter.style.display = 'none';
+
+    // Torna alla Home
+    const pSel = document.getElementById('selezionePanel');
+    if(pSel) pSel.style.display = 'block';
+
+    const mainT = document.getElementById('mainTitle');
+    if(mainT) mainT.style.display = 'block';
+
+    // Aggiorna UI
+    if(typeof refreshTredicesimaStatus === 'function') refreshTredicesimaStatus();
+    if(typeof generaBottoniMesi === 'function') generaBottoniMesi();
+};
+
+// Funzione Salva Busta (Aggiornata e sicura)
+window.salvaBusta = async function() { 
+    console.log("Eseguo salvaBusta...");
+    try {
+        const s = document.getElementById('inp_stipendio').value;
+        const f = document.getElementById('inp_ferie_residue').value;
+        const p = document.getElementById('inp_permessi_residue').value; 
+        
+        const meseKey = (typeof currentMonth === 'undefined' || currentMonth === null) ? 12 : currentMonth;
+        const k = `${currentYear}_${meseKey}`; 
+        
+        await saveBustaEntry(k, {stipendio:s, ferie:f, permessi:p});
+        
+        alert("Dati salvati correttamente!");
+        window.chiudiBusta(); // Chiama la funzione appena definita sopra
+        
+    } catch(e) {
+        console.error("Errore salvataggio:", e);
+        alert("Errore salvataggio: " + e.message);
+    }
+};
+
+// Assicuriamoci che anche le altre siano globali (se servono da HTML)
+window.apriBusta = apriBusta; 
+// ... aggiungi qui altre funzioni se necessario ...
+
+console.log("Funzioni globali definite correttamente.");
 
 
     </script>
