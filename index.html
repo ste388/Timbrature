@@ -79,14 +79,59 @@
         .row-sabato .giorno-label { color: #f57f17; font-weight: bold; }
         .stats-result-list { list-style: none; padding: 0; margin: 0; }
         .stats-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
-        .busta-row { margin-bottom: 15px; } .busta-label { display: block; font-weight: bold; margin-bottom: 5px; color: #555; }
-        .busta-input-group { display: flex; align-items: center; gap: 10px; } .busta-input { flex: 1; padding: 10px; font-size: 1.1rem; border: 1px solid #ccc; border-radius: 6px; text-align: right; }
+        .busta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    gap: 10px; /* Spazio tra etichetta e input */
+}
+/* Etichetta (es. "Residuo Ferie") */
+.busta-label {
+    flex: 1; /* Prende lo spazio necessario */
+    font-size: 0.95rem;
+    color: #555;
+    white-space: nowrap; /* Evita che vada a capo se possibile */
+}
+        /* Gruppo Input + Testo Conversione */
+.busta-input-group {
+    flex: 1; /* Prende il resto dello spazio (metà riga circa) */
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Spazio tra casella bianca e testo grigio */
+    justify-content: flex-end; /* Allinea tutto a destra */
+}
+ .busta-input { flex: 1; padding: 10px; font-size: 1.1rem; border: 1px solid #ccc; border-radius: 6px; text-align: right; }
         button.btn-busta { margin-top: 10px; padding: 12px; width: 100%; color: white; border: none; border-radius: 8px; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .busta-missing { background-color: #dc3545; animation: pulse 2s infinite; } .busta-ok { background-color: #28a745; }
         #loadingOverlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.9); z-index:9999; display:flex; justify-content:center; align-items:center; flex-direction:column; font-weight:bold; color:#007bff; }
 		
+		/* Casella input numerica */
+.busta-input {
+    width: 70px; /* Larghezza fissa e compatta */
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-align: right;
+    font-size: 1rem;
+}
+
+/* Testo conversione (es. "12g 2.52h") */
+.busta-conversion {
+    font-size: 0.85rem;
+    color: #666;
+    font-weight: bold;
+    white-space: nowrap; /* Fondamentale: non va a capo! */
+    min-width: 80px; /* Riserva spazio per evitare salti */
+}
 		
 		/* --- STILE MOBILE OTTIMIZZATO --- */
+		@media screen and (max-width: 400px) {
+    .busta-label { font-size: 0.85rem; }
+    .busta-input { width: 60px; font-size: 0.9rem; }
+    .busta-conversion { font-size: 0.75rem; }
+}
+		
 @media screen and (max-width: 768px) {
     
     /* 1. RIDUCIAMO IL CONTENITORE PRINCIPALE */
