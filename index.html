@@ -357,6 +357,8 @@
                 <button class="btn-13" id="btn13esima" onclick="apriTredicesima()"><span>🎁 13ª Mensilità</span></button>
                 <button class="btn-stats" onclick="apriStats()">📊 Statistiche</button>
                 <button class="btn-config" onclick="apriConfig()">⚙️ Modifica Orari Obbligatori</button>
+				<!-- NUOVO TASTO UTILITÀ -->
+				<button class="btn-config" onclick="apriUtility()" style="background-color:#6c757d; margin-top:5px;">🛠️ Utilità Dati (Export/Import)</button>
             </div>
 
             <div id="schedaMese">
@@ -401,6 +403,57 @@
             <button class="btn-modal-save" onclick="salvaTimbratura()">Calcola & Salva</button><button class="btn-modal-close" onclick="chiudiModalTime()">Annulla</button>
         </div>
     </div>
+	
+	<!-- MODALE UTILITÀ DATI -->
+<div id="utilityModal" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10000; justify-content:center; align-items:center;">
+    <div class="modal-content" style="background:white; padding:20px; border-radius:10px; width:90%; max-width:400px; max-height:90vh; overflow-y:auto;">
+        <h3 style="text-align:center; border-bottom:1px solid #eee; padding-bottom:10px; margin-top:0;">🛠️ Gestione Dati</h3>
+        
+        <!-- SELEZIONE INTERVALLO -->
+        <div style="background:#f8f9fa; padding:10px; border-radius:8px; margin-bottom:15px; border:1px solid #eee;">
+            <div style="font-weight:bold; margin-bottom:5px; color:#555;">📅 Seleziona Intervallo</div>
+            <div style="display:flex; gap:10px;">
+                <div style="flex:1;">
+                    <label style="font-size:0.8rem;">Dal:</label>
+                    <input type="date" id="utilStart" style="width:100%; padding:5px; border:1px solid #ccc; border-radius:4px;">
+                </div>
+                <div style="flex:1;">
+                    <label style="font-size:0.8rem;">Al:</label>
+                    <input type="date" id="utilEnd" style="width:100%; padding:5px; border:1px solid #ccc; border-radius:4px;">
+                </div>
+            </div>
+            <div style="text-align:right; margin-top:5px;">
+                <button onclick="impostaTuttoAnno()" style="font-size:0.75rem; padding:3px 8px; background:#e2e6ea; border:none; border-radius:4px; cursor:pointer;">Tutto l'anno</button>
+            </div>
+        </div>
+
+        <!-- SEZIONE ESPORTA -->
+        <div class="util-box" style="margin-bottom:15px; border-left:4px solid #28a745; padding-left:10px;">
+            <h4 style="margin:5px 0;">⬇️ Esporta Dati (Backup)</h4>
+            <p style="font-size:0.8rem; color:#666; margin-bottom:5px;">Scarica un file sicuro con i tuoi dati per il periodo selezionato.</p>
+            <button onclick="esportaDati()" style="width:100%; padding:8px; background:#28a745; color:white; border:none; border-radius:5px; cursor:pointer;">Scarica Backup (.json)</button>
+        </div>
+
+        <!-- SEZIONE IMPORTA -->
+        <div class="util-box" style="margin-bottom:15px; border-left:4px solid #007bff; padding-left:10px;">
+            <h4 style="margin:5px 0;">⬆️ Importa Dati</h4>
+            <p style="font-size:0.8rem; color:#666; margin-bottom:5px;">Carica un file backup. I dati esistenti verranno aggiornati.</p>
+            <input type="file" id="fileImport" accept=".json" style="display:none;" onchange="processaFileImport(this)">
+            <button onclick="document.getElementById('fileImport').click()" style="width:100%; padding:8px; background:#007bff; color:white; border:none; border-radius:5px; cursor:pointer;">Seleziona File da Caricare</button>
+        </div>
+
+        <!-- SEZIONE ELIMINA -->
+        <div class="util-box" style="margin-bottom:15px; border-left:4px solid #dc3545; padding-left:10px;">
+            <h4 style="margin:5px 0; color:#dc3545;">🗑️ Elimina Definitivamente</h4>
+            <p style="font-size:0.8rem; color:#666; margin-bottom:5px;">Attenzione: Cancella TUTTI i dati nel periodo selezionato.</p>
+            <button onclick="eliminaDatiPeriodo()" style="width:100%; padding:8px; background:#dc3545; color:white; border:none; border-radius:5px; cursor:pointer;">⚠️ Elimina Dati</button>
+        </div>
+
+        <button onclick="chiudiUtility()" style="width:100%; padding:10px; background:#6c757d; color:white; border:none; border-radius:5px; margin-top:10px;">Chiudi</button>
+    </div>
+</div>
+
+	
     <div id="riepilogoStipendiModal"><div class="modal-content"><h3 class="modal-title" style="border-bottom: 1px solid #eee; padding-bottom:10px;">Riepilogo Stipendi</h3><div id="containerStipendiList"></div><button class="btn-modal-close" onclick="chiudiRiepilogoStipendi()">Chiudi</button></div></div>
 
    <script type="module">
@@ -932,6 +985,168 @@ async function saveConfigData(newCfg) {
     refreshTredicesimaStatus(); 
     generaBottoniMesi(); 
 }
+
+
+// =========================================================
+//  GESTIONE UTILITÀ (EXPORT / IMPORT / DELETE)
+// =========================================================
+
+window.apriUtility = function() {
+    const d = new Date();
+    // Default: Dal 1 Gennaio a Oggi
+    document.getElementById('utilStart').value = `${d.getFullYear()}-01-01`;
+    document.getElementById('utilEnd').value = d.toISOString().split('T')[0];
+    document.getElementById('utilityModal').style.display = 'flex';
+};
+
+window.chiudiUtility = function() {
+    document.getElementById('utilityModal').style.display = 'none';
+};
+
+window.impostaTuttoAnno = function() {
+    const y = new Date().getFullYear();
+    document.getElementById('utilStart').value = `${y}-01-01`;
+    document.getElementById('utilEnd').value = `${y}-12-31`;
+};
+
+// --- 1. ESPORTAZIONE ---
+window.esportaDati = function() {
+    const start = document.getElementById('utilStart').value;
+    const end = document.getElementById('utilEnd').value;
+    if(!start || !end) { alert("Seleziona un intervallo date valido!"); return; }
+
+    console.log("Esportazione dal", start, "al", end);
+    
+    // Filtriamo i dati globalDB (Registro Ore)
+    const exportDB = {};
+    Object.keys(globalDB).forEach(key => {
+        if(key >= start && key <= end) {
+            exportDB[key] = globalDB[key];
+        }
+    });
+
+    // Filtriamo i dati globalBuste (Buste Paga) - Opzionale ma consigliato
+    // Le chiavi sono YYYY_M. Costruiamo una data fittizia per confrontare
+    const exportBuste = {};
+    Object.keys(globalBuste).forEach(key => {
+        const [y, m] = key.split('_');
+        // Creiamo una data "fine mese" per vedere se rientra
+        const dCheck = `${y}-${String(m).padStart(2,'0')}-01`;
+        if(dCheck >= start.substring(0,7) + "-01" && dCheck <= end) {
+            exportBuste[key] = globalBuste[key];
+        }
+    });
+
+    const exportData = {
+        tipo: "BACKUP_REGISTRO_ORE",
+        data_export: new Date().toISOString(),
+        autore: currentUser ? currentUser.email : "anonimo",
+        registro_ore: exportDB,
+        buste_paga: exportBuste,
+        config: globalConfig // Salviamo anche la config per sicurezza
+    };
+
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 2));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", `backup_ore_${start}_${end}.json`);
+    document.body.appendChild(downloadAnchorNode);
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+};
+
+// --- 2. IMPORTAZIONE ---
+window.processaFileImport = function(input) {
+    const file = input.files[0];
+    if(!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        try {
+            const json = JSON.parse(e.target.result);
+            if(json.tipo !== "BACKUP_REGISTRO_ORE") {
+                if(!confirm("Attenzione: Questo file non sembra un backup di questa app. Vuoi provare comunque?")) return;
+            }
+
+            const numOre = Object.keys(json.registro_ore || {}).length;
+            const numBuste = Object.keys(json.buste_paga || {}).length;
+
+            if(!confirm(`Trovati:\n- ${numOre} Giorni lavorati\n- ${numBuste} Buste paga\n\nVuoi importarli nel Cloud? (Sovrascriverà i dati esistenti per quelle date)`)) return;
+
+            document.getElementById('loadingOverlay').style.display = 'flex'; // Mostra caricamento
+
+            // Importiamo Registro Ore
+            if(json.registro_ore) {
+                for (const [key, data] of Object.entries(json.registro_ore)) {
+                    await saveDBEntry(key, data); // Funzione che salva su Firebase
+                }
+            }
+
+            // Importiamo Buste
+            if(json.buste_paga) {
+                for (const [key, data] of Object.entries(json.buste_paga)) {
+                    await saveBustaEntry(key, data);
+                }
+            }
+            
+            // Importiamo Config (Opzionale, chiediamo?)
+            // await saveConfigData(json.config);
+
+            alert("Importazione Completata con Successo! ✅");
+            location.reload(); // Ricarica per vedere i nuovi dati
+
+        } catch(err) {
+            console.error(err);
+            alert("Errore nella lettura del file: " + err.message);
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+    };
+    reader.readAsText(file);
+    // Reset input per poter ricaricare lo stesso file se serve
+    input.value = '';
+};
+
+// --- 3. ELIMINAZIONE MASSIVA ---
+window.eliminaDatiPeriodo = async function() {
+    const start = document.getElementById('utilStart').value;
+    const end = document.getElementById('utilEnd').value;
+    if(!start || !end) { alert("Seleziona un intervallo date valido!"); return; }
+
+    if(!confirm(`⚠️ ATTENZIONE ESTREMA ⚠️\n\nStai per CANCELLARE PER SEMPRE tutti i dati dal ${start} al ${end}.\n\nL'operazione NON è annullabile.\n\nSei sicuro al 100%?`)) return;
+
+    // Doppio controllo di sicurezza
+    const code = Math.floor(Math.random() * 9000) + 1000;
+    const check = prompt(`Per confermare la cancellazione, scrivi questo codice: ${code}`);
+    if(check != code) { alert("Codice errato. Operazione annullata."); return; }
+
+    document.getElementById('loadingOverlay').style.display = 'flex';
+
+    try {
+        let count = 0;
+        // Cancella Registro Ore
+        // Nota: Firebase non permette query di cancellazione di massa native lato client.
+        // Dobbiamo scorrere le chiavi locali (globalDB) e cancellare quelle che matchano.
+        // È più sicuro perché cancelliamo solo ciò che vediamo.
+        
+        // Per sicurezza ricarichiamo tutto prima? No, usiamo globalDB che è syncato.
+        const keysToDelete = Object.keys(globalDB).filter(k => k >= start && k <= end);
+        
+        for(const k of keysToDelete) {
+            await deleteDBEntry(k);
+            count++;
+        }
+
+        alert(`Operazione completata.\nEliminati ${count} giorni dal database.`);
+        location.reload();
+
+    } catch(e) {
+        console.error(e);
+        alert("Errore durante l'eliminazione: " + e.message);
+        document.getElementById('loadingOverlay').style.display = 'none';
+    }
+};
+
+
 
 // =========================================================
 //  FUNZIONI GLOBALI (Da mettere alla FINE dello script)
