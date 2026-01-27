@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
+
+<!-- PWA SETTINGS -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#007bff">
+    <link rel="apple-touch-icon" href="icons/192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro Ore Cloud</title>
@@ -1204,6 +1212,20 @@ window.apriBusta = apriBusta;
 console.log("Funzioni globali definite correttamente.");
 
 
+    </script>
+	
+	    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registrato con successo:', registration.scope);
+                    })
+                    .catch(err => {
+                        console.log('Fallita registrazione ServiceWorker:', err);
+                    });
+            });
+        }
     </script>
 </body>
 </html>
