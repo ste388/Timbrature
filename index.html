@@ -853,36 +853,87 @@ async function saveConfigData(newCfg) {
             calcolaTotali();
         }
 
-        function generGiorni(anno, mese) {
-            const container = document.getElementById('giorniContainer'); container.innerHTML = '';
+                function generGiorni(anno, mese) {
+            const container = document.getElementById('giorniContainer'); 
+            container.innerHTML = '';
+            
             const giorniTot = new Date(anno, mese+1, 0).getDate();
-            const oggi = new Date(); oggi.setHours(0,0,0,0);
+            const oggi = new Date(); 
+            oggi.setHours(0,0,0,0);
+            
             for(let i=1; i<=giorniTot; i++) {
                 let key = `${anno}-${String(mese+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
                 let dateObj = new Date(anno, mese, i);
                 let dayOfWeek = dateObj.getDay();
+                
                 let entry = globalDB[key] || {};
-                let prev = entry.previste || globalConfig[dayOfWeek] || "00:00";
-                let fatte = entry.fatte || "";
-                let tipo = entry.assenzaTipo || ""; let qty = entry.assenzaQty || "";
+                
+                // Ore Previste e Fatte
+                let prevHHMM = entry.previste || globalConfig[dayOfWeek] || "00:00";
+                let fatteHHMM = entry.fatte || "";
+                
+                // CALCOLO COLORE (Logica Semaforo)
+                let styleColor = ""; // Default: nero/grigio
+                if(fatteHHMM) {
+                    const minPrev = hhmmToMin(prevHHMM);
+                    const minFatte = hhmmToMin(fatteHHMM);
+                    
+                    if(minPrev > 0) {
+                        // Se c'era un target da raggiungere
+                        if(minFatte >= minPrev) {
+                            styleColor = "color:#28a745; font-weight:bold;"; // VERDE (Target raggiunto)
+                        } else {
+                            styleColor = "color:#dc3545; font-weight:bold;"; // ROSSO (Sotto target)
+                        }
+                    } else if (minFatte > 0) {
+                        // Se non c'era target (es. Sabato/Domenica) ma hai lavorato lo stesso
+                        styleColor = "color:#007bff; font-weight:bold;"; // BLU (Straordinario puro)
+                    }
+                }
+
+                let tipo = entry.assenzaTipo || ""; 
+                let qty = entry.assenzaQty || "";
                 let hasOrari = entry.orari && (entry.orari.in1 || entry.orari.in2);
-                let cl = ['giorno-row']; if(dayOfWeek===0) cl.push('row-domenica'); else if(dayOfWeek===6) cl.push('row-sabato'); if(dateObj<oggi) cl.push('row-passato');
-                let btnL = "+", btnC = "btn-extra"; if(tipo) { btnC+=" active"; btnL=`${tipo.substr(0,3).toUpperCase()}<br>${qty}${(tipo==='Permesso'?'h':'g')}`; }
+                
+                let cl = ['giorno-row']; 
+                if(dayOfWeek===0) cl.push('row-domenica'); 
+                else if(dayOfWeek===6) cl.push('row-sabato'); 
+                if(dateObj<oggi) cl.push('row-passato');
+                
+                let btnL = "+", btnC = "btn-extra"; 
+                if(tipo) { 
+                    btnC+=" active"; 
+                    // Nota: qui assumo che hai già messo il CSS per i bottoni piccoli
+                    btnL=`${tipo.substr(0,3).toUpperCase()}<br>${qty}${(tipo==='Permesso'?'h':'g')}`; 
+                }
+                
                 container.innerHTML += `
                 <div class="giorno-wrapper">
                     <div class="${cl.join(' ')}">
                         <span class="giorno-label">${i} ${dateObj.toLocaleDateString('it-IT',{weekday:'short'})}</span>
-                        <div class="giorno-previsto" id="prev_${key}">${prev}</div>
+                        <div class="giorno-previsto" id="prev_${key}">${prevHHMM}</div>
+                        
                         <div class="input-group-ore">
-                            <input type="text" class="giorno-input" id="input_fatte_${key}" value="${fatte}" onchange="salvaTutto('${key}')" placeholder="--:--" maxlength="5">
+                            <!-- QUI APPLICO LO STYLE COLOR -->
+                            <input type="text" class="giorno-input" id="input_fatte_${key}" 
+                                   value="${fatteHHMM}" 
+                                   style="${styleColor}"
+                                   onchange="salvaTutto('${key}')" 
+                                   placeholder="--:--" maxlength="5">
+                                   
                             <button class="btn-clock ${hasOrari?'has-time':''}" onclick="apriModalTime('${key}')">🕒</button>
                         </div>
+                        
                         <button class="${btnC}" id="btn_extra_${key}" onclick="toggleAssenze('${key}')">${btnL}</button>
                     </div>
                     <div class="assenze-panel" id="panel_${key}">
                         <div class="assenze-row">
                             <select class="assenze-select" id="sel_tipo_${key}" onchange="gestisciInputAssenza('${key}')">
-                                <option value="">Nessuna</option><option value="Ferie" ${tipo==='Ferie'?'selected':''}>Ferie</option><option value="Malattia" ${tipo==='Malattia'?'selected':''}>Malattia</option><option value="Permesso" ${tipo==='Permesso'?'selected':''}>Permesso</option><option value="Festivo" ${tipo==='Festivo'?'selected':''}>Festivo</option>
+                                <option value="">Nessuna</option>
+                                <option value="Ferie" ${tipo==='Ferie'?'selected':''}>Ferie</option>
+                                <option value="Malattia" ${tipo==='Malattia'?'selected':''}>Malattia</option>
+                                <option value="Permesso" ${tipo==='Permesso'?'selected':''}>Permesso</option>
+                                <option value="Festivo" ${tipo==='Festivo'?'selected':''}>Festivo</option>
                             </select>
                             <input class="assenze-qty" id="inp_qty_${key}" value="${qty}" onkeyup="salvaTutto('${key}')" ${tipo==='Permesso'?'':'readonly'}>
                         </div>
@@ -891,6 +942,7 @@ async function saveConfigData(newCfg) {
                 </div>`;
             }
         }
+
 
         function toggleAssenze(k) { const p=document.getElementById('panel_'+k); p.style.display=p.style.display==='block'?'none':'block'; }
         function gestisciInputAssenza(k) { 
