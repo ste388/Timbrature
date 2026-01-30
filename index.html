@@ -465,51 +465,52 @@
     <div id="riepilogoStipendiModal"><div class="modal-content"><h3 class="modal-title" style="border-bottom: 1px solid #eee; padding-bottom:10px;">Riepilogo Stipendi</h3><div id="containerStipendiList"></div><button class="btn-modal-close" onclick="chiudiRiepilogoStipendi()">Chiudi</button></div></div>
 
    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        // 1. IMPORTIAMO enableIndexedDbPersistence
-        import { getFirestore, collection, doc, getDoc, setDoc, deleteDoc, getDocs, query, where, onSnapshot, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    
+    // 1. IMPORT AGGIORNATI (Tolto enableIndexedDbPersistence, messi initializeFirestore e persistentLocalCache)
+    import { 
+        getFirestore, 
+        initializeFirestore, 
+        persistentLocalCache, 
+        collection, doc, getDoc, setDoc, deleteDoc, getDocs, query, where, onSnapshot 
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    
+    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    // CONFIGURAZIONE FIREBASE
+    const firebaseConfig = {
+      apiKey: "AIzaSyB9k5Rp5BvaH0pBA0FUDnZ0GBquvD_8bpc",
+      authDomain: "registro-ore-app.firebaseapp.com",
+      projectId: "registro-ore-app",
+      storageBucket: "registro-ore-app.firebasestorage.app",
+      messagingSenderId: "730416680153",
+      appId: "1:730416680153:web:c936c80343a9446b2042c8"
+    };
+
+    let db;
+    let auth; 
+    let currentUser = null; 
+
+    try {
+        const app = initializeApp(firebaseConfig);
         
-        // NUOVO: Importiamo le funzioni per l'Autenticazione
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        // 2. NUOVA INIZIALIZZAZIONE CON CACHE PERSISTENTE (OFFLINE)
+        // Questo sostituisce il vecchio metodo e toglie l'avviso giallo.
+        db = initializeFirestore(app, {
+            localCache: persistentLocalCache()
+        });
 
-        // CONFIGURAZIONE FIREBASE INSERITA
-        const firebaseConfig = {
-          apiKey: "AIzaSyB9k5Rp5BvaH0pBA0FUDnZ0GBquvD_8bpc",
-          authDomain: "registro-ore-app.firebaseapp.com",
-          projectId: "registro-ore-app",
-          storageBucket: "registro-ore-app.firebasestorage.app",
-          messagingSenderId: "730416680153",
-          appId: "1:730416680153:web:c936c80343a9446b2042c8"
-        };
+        auth = getAuth(app); 
 
-        let db;
-        let auth; 
-        let currentUser = null; 
+        console.log("Firebase & Auth initialized (Offline Mode Ready v2)");
+    } catch(e) {
+        console.error("Firebase init error", e);
+        alert("Errore Configurazione Firebase! Controlla la console.");
+    }
 
-        try {
-            const app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
-            auth = getAuth(app); 
+    const defaultConfig = { 1: "07:00", 2: "07:00", 3: "08:00", 4: "07:00", 5: "07:00", 6: "00:00", 0: "00:00", pausa: "00:00" }; 
+    // ... il resto del tuo codice prosegue uguale ...
 
-            // 2. ATTIVAZIONE PERSISTENZA OFFLINE
-            enableIndexedDbPersistence(db).then(() => {
-                 console.log("✅ Persistenza Offline ATTIVATA!");
-            }).catch((err) => {
-                if (err.code == 'failed-precondition') {
-                    console.warn("⚠️ Persistenza fallita: Più schede aperte.");
-                } else if (err.code == 'unimplemented') {
-                    console.warn("⚠️ Browser non supporta persistenza.");
-                }
-            });
-
-            console.log("Firebase & Auth initialized (Offline Mode Ready)");
-        } catch(e) {
-            console.error("Firebase init error", e);
-            alert("Errore Configurazione Firebase! Controlla la console.");
-        }
-
-        const defaultConfig = { 1: "07:00", 2: "07:00", 3: "08:00", 4: "07:00", 5: "07:00", 6: "00:00", 0: "00:00", pausa: "00:00" }; 
-        // ... (qui prosegue il resto del tuo codice) ...
 
     let currentYear = new Date().getFullYear();
     let currentMonth = 0; // Gennaio = 0
@@ -848,9 +849,53 @@ async function saveConfigData(newCfg) {
             entry.previste = prev;
             if(totNetto > 0 || in1) { entry.fatte = minToHHMM(totNetto); } else { entry.fatte = ""; }
             await saveDBEntry(key, entry);
-            document.getElementById('input_fatte_'+key).value = entry.fatte;
+			
+			    const inputEl = document.getElementById('input_fatte_'+key);
+    if(inputEl) inputEl.value = entry.fatte;
+			    aggiornaColoreInput(key, entry.fatte); // <--- Passa il valore esplicito!
+				
+
             chiudiModalTime(); calcolaTotali();
         }
+
+function aggiornaColoreInput(key, valoreForzato = null) {
+    const inputEl = document.getElementById(`input_fatte_${key}`);
+    const prevEl = document.getElementById(`prev_${key}`);
+    
+    if(!inputEl || !prevEl) return;
+
+    // Se mi passi il valore (es. dalla modale), uso quello. 
+    // Altrimenti leggo quello che c'è scritto nell'input ora.
+    const oreFatte = (valoreForzato !== null) ? valoreForzato : inputEl.value; 
+    const orePrev = prevEl.innerText;
+    
+    const toMin = (s) => { if(!s) return 0; const [h,m]=s.split(':'); return parseInt(h)*60 + parseInt(m); };
+
+    if(oreFatte) {
+        const minFatte = toMin(oreFatte);
+        const minPrev = toMin(orePrev);
+        
+        // Applichiamo stile
+        let color = "";
+        let weight = "";
+        
+        if(minPrev > 0) {
+            if(minFatte >= minPrev) { color = "#28a745"; weight = "bold"; } // Verde
+            else { color = "#dc3545"; weight = "bold"; } // Rosso
+        } else if(minFatte > 0) {
+            color = "#007bff"; weight = "bold"; // Blu
+        }
+        
+        inputEl.style.color = color;
+        inputEl.style.fontWeight = weight;
+        
+    } else {
+        inputEl.style.color = ""; 
+        inputEl.style.fontWeight = "";
+    }
+}
+
+
 
         async function salvaTutto(key) {
             let valFatte = document.getElementById(`input_fatte_${key}`).value;
@@ -865,10 +910,14 @@ async function saveConfigData(newCfg) {
             entry.fatte = valFatte; entry.previste = prev; entry.assenzaTipo = valTipo; entry.assenzaQty = valQty;
             if(!valFatte && !valTipo && !entry.orari?.in1) { await deleteDBEntry(key); }
             else { await saveDBEntry(key, entry); }
+			
+			aggiornaColoreInput(key, valFatte);
             calcolaTotali();
-        }
-
-                function generGiorni(anno, mese) {
+			
+			
+            }
+			
+            function generGiorni(anno, mese) {
             const container = document.getElementById('giorniContainer'); 
             container.innerHTML = '';
             
@@ -1037,7 +1086,40 @@ async function saveConfigData(newCfg) {
 		
 		
         function generaBottoniMesi() { const c=document.getElementById('mesiContainer'); c.innerHTML=''; const now=new Date(), ry=now.getFullYear(), rm=now.getMonth(), sy=parseInt(document.getElementById('annoSelect').value); nomiMesi.forEach((m,i)=>{ let b=document.createElement('button'); b.className='btn-mese'; if(sy<ry || (sy===ry && i<rm)) b.classList.add('btn-mese-concluso'); const d=globalBuste[`${sy}_${i}`]; let st='status-unpaid'; if(d?.stipendio) st='status-paid'; b.innerHTML=`${m}<span class="status-dot ${st}"></span>`; b.onclick=()=>apriMese(i); c.appendChild(b); }); }
-        function apriMese(i) { toggleMainTitle(false); currentMonth=i; document.getElementById('selezionePanel').style.display='none'; document.getElementById('schedaMese').style.display='block'; document.getElementById('footerTotali').style.display='flex'; document.getElementById('titoloMese').innerText=`${nomiMesi[i]} ${currentYear}`; generGiorni(currentYear,i); calcolaTotali(); checkBustaStatus(); }
+
+		window.apriMese = function(i) { 
+			toggleMainTitle(false); 
+			currentMonth = i; 
+			
+			document.getElementById('selezionePanel').style.display = 'none'; 
+			document.getElementById('schedaMese').style.display = 'block'; 
+			document.getElementById('footerTotali').style.display = 'flex'; 
+			document.getElementById('titoloMese').innerText = `${nomiMesi[i]} ${currentYear}`; 
+			
+			generGiorni(currentYear, i); 
+			calcolaTotali(); 
+			checkBustaStatus(); 
+
+			// --- NUOVO: SCROLL AUTOMATICO AL GIORNO DI OGGI ---
+			setTimeout(() => {
+				const today = new Date();
+				// Lo facciamo solo se stiamo aprendo il mese corrente dell'anno corrente
+				if(today.getMonth() === i && today.getFullYear() === currentYear) {
+					const y = today.getFullYear();
+					const m = String(today.getMonth() + 1).padStart(2, '0');
+					const d = String(today.getDate()).padStart(2, '0');
+					const oggiKey = `${y}-${m}-${d}`;
+					
+					// Cerchiamo l'elemento del giorno
+					const el = document.getElementById('input_fatte_' + oggiKey);
+					if(el) {
+						// Scrolliamo per metterlo al centro dello schermo
+						el.scrollIntoView({ behavior: "smooth", block: "center" });
+					}
+				}
+			}, 100); // Piccolo ritardo per assicurarsi che l'HTML sia pronto
+		};
+
         function chiudiScheda() { toggleMainTitle(true); document.getElementById('schedaMese').style.display='none'; document.getElementById('footerTotali').style.display='none'; document.getElementById('selezionePanel').style.display='block'; refreshTredicesimaStatus(); generaBottoniMesi(); }
         
         function apriStats() { toggleMainTitle(false); document.getElementById('selezionePanel').style.display='none'; document.getElementById('statsPanel').style.display='block'; document.getElementById('statsAnno').value=currentYear; calcolaStats(); }
@@ -1279,6 +1361,8 @@ window.apriBusta = apriBusta;
 console.log("Funzioni globali definite correttamente.");
 
 
+
+
     </script>
 	
 	    <script>
@@ -1293,6 +1377,38 @@ console.log("Funzioni globali definite correttamente.");
                     });
             });
         }
+		
+				// Definizione sicura di apriMese
+		function apriMeseLocale(i) { 
+			toggleMainTitle(false); 
+			currentMonth = i; 
+			
+			document.getElementById('selezionePanel').style.display = 'none'; 
+			document.getElementById('schedaMese').style.display = 'block'; 
+			document.getElementById('footerTotali').style.display = 'flex'; 
+			document.getElementById('titoloMese').innerText = `${nomiMesi[i]} ${currentYear}`; 
+			
+			generGiorni(currentYear, i); 
+			calcolaTotali(); 
+			checkBustaStatus(); 
+
+			// Scroll al giorno di oggi
+			setTimeout(() => {
+				const today = new Date();
+				if(today.getMonth() === i && today.getFullYear() === currentYear) {
+					const y = today.getFullYear();
+					const m = String(today.getMonth() + 1).padStart(2, '0');
+					const d = String(today.getDate()).padStart(2, '0');
+					const oggiKey = `${y}-${m}-${d}`;
+					const el = document.getElementById('input_fatte_' + oggiKey);
+					if(el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+				}
+			}, 100);
+		}
+
+		// Rendiamola disponibile sia dentro che fuori
+		window.apriMese = apriMeseLocale;
+
     </script>
 </body>
 </html>
