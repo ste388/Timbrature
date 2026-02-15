@@ -914,98 +914,198 @@ function aggiornaColoreInput(key, valoreForzato = null) {
 			aggiornaColoreInput(key, valFatte);
             calcolaTotali();
 			
+			    // Dopo aver salvato, ricalcolo le settimane del mese corrente
+			ricalcolaTotSettimane();
 			
             }
 			
-            function generGiorni(anno, mese) {
-            const container = document.getElementById('giorniContainer'); 
-            container.innerHTML = '';
+        function generGiorni(anno, mese) {
+    const container = document.getElementById('giorniContainer'); 
+    container.innerHTML = '';
+    
+    const giorniTot = new Date(anno, mese+1, 0).getDate();
+    const oggi = new Date(); 
+    oggi.setHours(0,0,0,0);
+    
+    for(let i=1; i<=giorniTot; i++) {
+        let key = `${anno}-${String(mese+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+        let dateObj = new Date(anno, mese, i);
+        let dayOfWeek = dateObj.getDay();
+        
+        let entry = globalDB[key] || {};
+        
+        // Ore Previste e Fatte
+        let prevHHMM = entry.previste || globalConfig[dayOfWeek] || "00:00";
+        let fatteHHMM = entry.fatte || "";
+        
+        // CALCOLO COLORE (Logica Semaforo)
+        let styleColor = "";
+        if(fatteHHMM) {
+            const minPrev = hhmmToMin(prevHHMM);
+            const minFatte = hhmmToMin(fatteHHMM);
             
-            const giorniTot = new Date(anno, mese+1, 0).getDate();
-            const oggi = new Date(); 
-            oggi.setHours(0,0,0,0);
-            
-            for(let i=1; i<=giorniTot; i++) {
-                let key = `${anno}-${String(mese+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
-                let dateObj = new Date(anno, mese, i);
-                let dayOfWeek = dateObj.getDay();
-                
-                let entry = globalDB[key] || {};
-                
-                // Ore Previste e Fatte
-                let prevHHMM = entry.previste || globalConfig[dayOfWeek] || "00:00";
-                let fatteHHMM = entry.fatte || "";
-                
-                // CALCOLO COLORE (Logica Semaforo)
-                let styleColor = ""; // Default: nero/grigio
-                if(fatteHHMM) {
-                    const minPrev = hhmmToMin(prevHHMM);
-                    const minFatte = hhmmToMin(fatteHHMM);
-                    
-                    if(minPrev > 0) {
-                        // Se c'era un target da raggiungere
-                        if(minFatte >= minPrev) {
-                            styleColor = "color:#28a745; font-weight:bold;"; // VERDE (Target raggiunto)
-                        } else {
-                            styleColor = "color:#dc3545; font-weight:bold;"; // ROSSO (Sotto target)
-                        }
-                    } else if (minFatte > 0) {
-                        // Se non c'era target (es. Sabato/Domenica) ma hai lavorato lo stesso
-                        styleColor = "color:#007bff; font-weight:bold;"; // BLU (Straordinario puro)
-                    }
+            if(minPrev > 0) {
+                if(minFatte >= minPrev) {
+                    styleColor = "color:#28a745; font-weight:bold;"; // VERDE
+                } else {
+                    styleColor = "color:#dc3545; font-weight:bold;"; // ROSSO
                 }
-
-                let tipo = entry.assenzaTipo || ""; 
-                let qty = entry.assenzaQty || "";
-                let hasOrari = entry.orari && (entry.orari.in1 || entry.orari.in2);
-                
-                let cl = ['giorno-row']; 
-                if(dayOfWeek===0) cl.push('row-domenica'); 
-                else if(dayOfWeek===6) cl.push('row-sabato'); 
-                if(dateObj<oggi) cl.push('row-passato');
-                
-                let btnL = "+", btnC = "btn-extra"; 
-                if(tipo) { 
-                    btnC+=" active"; 
-                    // Nota: qui assumo che hai già messo il CSS per i bottoni piccoli
-                    btnL=`${tipo.substr(0,3).toUpperCase()}<br>${qty}${(tipo==='Permesso'?'h':'g')}`; 
-                }
-                
-                container.innerHTML += `
-                <div class="giorno-wrapper">
-                    <div class="${cl.join(' ')}">
-                        <span class="giorno-label">${i} ${dateObj.toLocaleDateString('it-IT',{weekday:'short'})}</span>
-                        <div class="giorno-previsto" id="prev_${key}">${prevHHMM}</div>
-                        
-                        <div class="input-group-ore">
-                            <!-- QUI APPLICO LO STYLE COLOR -->
-                            <input type="text" class="giorno-input" id="input_fatte_${key}" 
-                                   value="${fatteHHMM}" 
-                                   style="${styleColor}"
-                                   onchange="salvaTutto('${key}')" 
-                                   placeholder="--:--" maxlength="5">
-                                   
-                            <button class="btn-clock ${hasOrari?'has-time':''}" onclick="apriModalTime('${key}')">🕒</button>
-                        </div>
-                        
-                        <button class="${btnC}" id="btn_extra_${key}" onclick="toggleAssenze('${key}')">${btnL}</button>
-                    </div>
-                    <div class="assenze-panel" id="panel_${key}">
-                        <div class="assenze-row">
-                            <select class="assenze-select" id="sel_tipo_${key}" onchange="gestisciInputAssenza('${key}')">
-                                <option value="">Nessuna</option>
-                                <option value="Ferie" ${tipo==='Ferie'?'selected':''}>Ferie</option>
-                                <option value="Malattia" ${tipo==='Malattia'?'selected':''}>Malattia</option>
-                                <option value="Permesso" ${tipo==='Permesso'?'selected':''}>Permesso</option>
-                                <option value="Festivo" ${tipo==='Festivo'?'selected':''}>Festivo</option>
-                            </select>
-                            <input class="assenze-qty" id="inp_qty_${key}" value="${qty}" onkeyup="salvaTutto('${key}')" ${tipo==='Permesso'?'':'readonly'}>
-                        </div>
-                        <button onclick="confermaAssenza('${key}')" style="width:100%;padding:5px;">Chiudi</button>
-                    </div>
-                </div>`;
+            } else if (minFatte > 0) {
+                styleColor = "color:#007bff; font-weight:bold;"; // BLU
             }
         }
+
+        let tipo = entry.assenzaTipo || ""; 
+        let qty = entry.assenzaQty || "";
+        let hasOrari = entry.orari && (entry.orari.in1 || entry.orari.in2);
+        
+        let cl = ['giorno-row']; 
+        if(dayOfWeek===0) cl.push('row-domenica'); 
+        else if(dayOfWeek===6) cl.push('row-sabato'); 
+        if(dateObj<oggi) cl.push('row-passato');
+        
+        let btnL = "+", btnC = "btn-extra"; 
+        if(tipo) { 
+            btnC+=" active"; 
+            btnL=`${tipo.substr(0,3).toUpperCase()}<br>${qty}${(tipo==='Permesso'?'h':'g')}`; 
+        }
+        
+        container.innerHTML += `
+        <div class="giorno-wrapper">
+            <div class="${cl.join(' ')}">
+                <span class="giorno-label">${i} ${dateObj.toLocaleDateString('it-IT',{weekday:'short'})}</span>
+                <div class="giorno-previsto" id="prev_${key}">${prevHHMM}</div>
+                
+                <div class="input-group-ore">
+                    <input type="text" class="giorno-input" id="input_fatte_${key}" 
+                           value="${fatteHHMM}" 
+                           style="${styleColor}"
+                           onchange="salvaTutto('${key}')" 
+                           placeholder="--:--" maxlength="5">
+                           
+                    <button class="btn-clock ${hasOrari?'has-time':''}" onclick="apriModalTime('${key}')">🕒</button>
+                </div>
+                
+                <button class="${btnC}" id="btn_extra_${key}" onclick="toggleAssenze('${key}')">${btnL}</button>
+            </div>
+            <div class="assenze-panel" id="panel_${key}">
+                <div class="assenze-row">
+                    <select class="assenze-select" id="sel_tipo_${key}" onchange="gestisciInputAssenza('${key}')">
+                        <option value="">Nessuna</option>
+                        <option value="Ferie" ${tipo==='Ferie'?'selected':''}>Ferie</option>
+                        <option value="Malattia" ${tipo==='Malattia'?'selected':''}>Malattia</option>
+                        <option value="Permesso" ${tipo==='Permesso'?'selected':''}>Permesso</option>
+                        <option value="Festivo" ${tipo==='Festivo'?'selected':''}>Festivo</option>
+                    </select>
+                    <input class="assenze-qty" id="inp_qty_${key}" value="${qty}" onkeyup="salvaTutto('${key}')" ${tipo==='Permesso'?'':'readonly'}>
+                </div>
+                <button onclick="confermaAssenza('${key}')" style="width:100%;padding:5px;">Chiudi</button>
+            </div>
+        </div>`;
+    }
+    
+    // 🔑 UNA SOLA chiamata: genera TUTTI i TOT corretti
+    setTimeout(() => {
+        console.log('🚀 generGiorni → ricalcolaTotSettimane');
+        ricalcolaTotSettimane();
+    }, 100);
+}
+
+
+function ricalcolaTotSettimane() {
+    const container = document.getElementById('giorniContainer');
+    if (!container) return;
+
+    container.querySelectorAll('.row-tot-settimana').forEach(r => r.remove());
+
+    const giornoNum = { 'lun':1, 'mar':2, 'mer':3, 'gio':4, 'ven':5, 'sab':6, 'dom':0 };
+    const giorni = Array.from(container.querySelectorAll('.giorno-wrapper:not(.row-tot-settimana)'));
+
+    giorni.forEach((wrapper) => {
+        const row = wrapper.querySelector('.giorno-row');
+        if (!row) return;
+
+        const labelText = row.querySelector('.giorno-label')?.textContent?.trim() || '';
+        const parts = labelText.split(' ');
+        const giornoMese = parseInt(parts[0]);
+        const giornoShort = parts[1]?.toLowerCase() || '';
+        const numGiorno = giornoNum[giornoShort];
+
+        // 🔑 SOLO se DOMENICA: calcola settimana COMPLETA da globalDB
+        if (numGiorno === 0) {
+            const dataDomenica = new Date(currentYear, currentMonth, giornoMese);
+            
+            // Trova LUNEDÌ della settimana (ritorno indietro fino a lun)
+            const lunedi = new Date(dataDomenica);
+            const diffDays = dataDomenica.getDay() === 0 ? 6 : dataDomenica.getDay() - 1;
+            lunedi.setDate(dataDomenica.getDate() - diffDays);
+
+            console.log(`📅 DOMENICA ${giornoMese} → Settimana da ${lunedi.toLocaleDateString('it-IT')}`);
+
+            // Somma TUTTE ore lun-dom da globalDB
+            let totMin = 0;
+            let d = new Date(lunedi);
+            while (d <= dataDomenica) {
+                const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+                const entry = globalDB[key];
+                if (entry?.fatte) {
+                    const mins = hhmmToMin(entry.fatte);
+                    totMin += mins;
+                    console.log(`   📦 ${key}: ${entry.fatte} (+${mins}min) → totMin:${totMin}`);
+                }
+                d.setDate(d.getDate() + 1);
+            }
+
+            const hhmm = minToHHMM(totMin);
+            const totDiv = document.createElement('div');
+            totDiv.className = 'giorno-wrapper row-tot-settimana';
+            totDiv.innerHTML = `
+                <div class="giorno-row" style="background:#f1f3f5; border-top:1px solid #ccc; border-bottom:1px solid #ccc;">
+                    <span class="giorno-label" style="font-weight:bold;">TOT</span>
+                    <div class="giorno-previsto" style="font-size:0.8rem;">Sett. Completa</div>
+                    <div class="input-group-ore">
+                        <input class="giorno-input" value="${hhmm}" readonly style="font-weight:bold; color:#343a40; background:#e9ecef;">
+                        <button class="btn-clock" disabled style="opacity:0;">🕒</button>
+                    </div>
+                    <button class="btn-extra" disabled style="visibility:hidden;">+</button>
+                </div>
+            `;
+            wrapper.after(totDiv);
+            console.log(`✅ ✅ TOT SETTIMANA: ${hhmm}\n`);
+        }
+    });
+}
+
+
+
+
+
+
+
+// Helper per creare riga TOT (DRY)
+function creaTotDiv(posizione, hhmm, label) {
+    const totDiv = document.createElement('div');
+    totDiv.className = 'giorno-wrapper row-tot-settimana';
+    totDiv.innerHTML = `
+        <div class="giorno-row" style="background:#f1f3f5; border-top:1px solid #ccc; border-bottom:1px solid #ccc;">
+            <span class="giorno-label" style="font-weight:bold;">TOT</span>
+            <div class="giorno-previsto" style="font-size:0.8rem;">${label}</div>
+            <div class="input-group-ore">
+                <input class="giorno-input" value="${hhmm}" readonly style="font-weight:bold; color:#343a40; background:#e9ecef;">
+                <button class="btn-clock" disabled style="opacity:0;">🕒</button>
+            </div>
+            <button class="btn-extra" disabled style="visibility:hidden;">+</button>
+        </div>
+    `;
+    if (posizione.after) {
+        posizione.after(totDiv);
+    } else {
+        posizione.appendChild(totDiv);
+    }
+}
+
+
+
 
 
         function toggleAssenze(k) { const p=document.getElementById('panel_'+k); p.style.display=p.style.display==='block'?'none':'block'; }
