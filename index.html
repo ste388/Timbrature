@@ -1224,8 +1224,68 @@ function creaTotDiv(posizione, hhmm, label) {
         
         function apriStats() { toggleMainTitle(false); document.getElementById('selezionePanel').style.display='none'; document.getElementById('statsPanel').style.display='block'; document.getElementById('statsAnno').value=currentYear; calcolaStats(); }
         function chiudiStats() { toggleMainTitle(true); document.getElementById('statsPanel').style.display='none'; document.getElementById('selezionePanel').style.display='block'; }
-        function calcolaStats() { const a=document.getElementById('statsAnno').value, t=document.getElementById('statsTipo').value, l=document.getElementById('statsList'), tb=document.getElementById('statsTotal'); l.innerHTML=''; let s=0, c=0; Object.keys(globalDB).sort().forEach(k=>{ if(k.startsWith(a)){ const e=globalDB[k]; if(e.assenzaTipo===t){ let v=0,vd=""; if(t==='Permesso'){v=hhmmToMin(e.assenzaQty); vd=e.assenzaQty+"h";} else {v=parseFloat(e.assenzaQty)||0; vd=v+(v>1?'gg':'g');} s+=v; c++; const d=new Date(k); l.innerHTML+=`<li class="stats-item"><span>${d.toLocaleDateString('it-IT',{day:'numeric',month:'long'})}</span><b>${vd}</b></li>`; } } }); if(c===0) {l.innerHTML='<li style="text-align:center;padding:20px;">Nessun dato</li>'; tb.innerText="Totale: 0";} else tb.innerText=`Totale: ${t==='Permesso'?minToHHMM(s)+' Ore':s+' Giorni'}`; }
+        
+		function calcolaStats() {
+    const a = document.getElementById('statsAnno').value;
+    const t = document.getElementById('statsTipo').value;
+    const l = document.getElementById('statsList');
+    const tb = document.getElementById('statsTotal');
+    
+    l.innerHTML = '';
+    let s = 0, c = 0;
 
+    // Funzione interna per leggere correttamente i permessi ("1h", "1.5", "01:30")
+    function parsePermesso(val) {
+        if (!val) return 0;
+        let v = String(val).toLowerCase().replace('h', '').trim();
+        
+        // Se è scritto "01:30"
+        if (v.includes(':')) {
+            const [h, m] = v.split(':');
+            return (parseInt(h) || 0) * 60 + (parseInt(m) || 0);
+        }
+        
+        // Se è scritto "1" o "1.5" o "1,5"
+        v = v.replace(',', '.');
+        const num = parseFloat(v);
+        if (!isNaN(num)) {
+            return Math.round(num * 60); // Trasforma le ore in minuti
+        }
+        return 0;
+    }
+
+    Object.keys(globalDB).sort().forEach(k => {
+        if (k.startsWith(a)) {
+            const e = globalDB[k];
+            if (e.assenzaTipo === t) {
+                let v = 0;
+                let vd = "";
+                
+                if (t === 'Permesso') {
+                    // Usa la nuova funzione per i permessi
+                    v = parsePermesso(e.assenzaQty); 
+                    vd = e.assenzaQty + (String(e.assenzaQty).toLowerCase().includes('h') ? '' : 'h');
+                } else {
+                    v = parseFloat(e.assenzaQty) || 0; 
+                    vd = v + (v > 1 ? 'gg' : 'g');
+                }
+                
+                s += v; 
+                c++; 
+                
+                const d = new Date(k);
+                l.innerHTML += `<li class="stats-item"><span>${d.toLocaleDateString('it-IT',{day:'numeric',month:'long'})}</span><b>${vd}</b></li>`;
+            }
+        }
+    });
+
+    if (c === 0) {
+        l.innerHTML = '<li style="text-align:center;padding:20px;">Nessun dato</li>';
+        tb.innerText = "Totale: 0";
+    } else {
+        tb.innerText = `Totale: ${t === 'Permesso' ? minToHHMM(s) + ' Ore' : s + ' Giorni'}`;
+    }
+}
        window.chiudiBusta = function() { 
     // Nascondi pannello busta
     document.getElementById('bustaPanel').style.display = 'none'; 
