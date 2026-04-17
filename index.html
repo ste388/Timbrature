@@ -1117,20 +1117,46 @@ function creaTotDiv(posizione, hhmm, label) {
         function confermaAssenza(k) { salvaTutto(k); document.getElementById('panel_'+k).style.display='none'; }
         
         function calcolaTotali() {
-            let tm=0, tp=0, tf=0, tmal=0; const days = new Date(currentYear, currentMonth+1,0).getDate();
-            for(let i=1; i<=days; i++) {
-                let k = `${currentYear}-${String(currentMonth+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
-                let e = globalDB[k];
-                if(e) {
-                    if(e.fatte) tm += hhmmToMin(e.fatte);
-                    if(e.assenzaTipo==='Ferie') tf += parseFloat(e.assenzaQty)||0;
-                    if(e.assenzaTipo==='Malattia') tmal += parseFloat(e.assenzaQty)||0;
-                    if(e.assenzaTipo==='Permesso') tp += hhmmToMin(e.assenzaQty);
+    let tm = 0, tp = 0, tf = 0, tmal = 0; 
+    const days = new Date(currentYear, currentMonth + 1, 0).getDate();
+    
+    for(let i = 1; i <= days; i++) {
+        let k = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+        let e = globalDB[k];
+        
+        if(e) {
+            // Somma ore lavorate
+            if(e.fatte) tm += hhmmToMin(e.fatte);
+            
+            // Somma giorni di ferie e malattia
+            if(e.assenzaTipo === 'Ferie') tf += parseFloat(e.assenzaQty) || 0;
+            if(e.assenzaTipo === 'Malattia') tmal += parseFloat(e.assenzaQty) || 0;
+            
+            // Somma permessi (Logica ant-NaN per supportare "1h", "1,5", "01:30")
+            if(e.assenzaTipo === 'Permesso') {
+                let val = String(e.assenzaQty || "0").toLowerCase().replace('h', '').trim();
+                
+                if (val.includes(':')) {
+                    const [h, m] = val.split(':');
+                    tp += (parseInt(h) || 0) * 60 + (parseInt(m) || 0);
+                } else {
+                    val = val.replace(',', '.'); // Supporta sia virgola che punto
+                    const num = parseFloat(val);
+                    if (!isNaN(num)) {
+                        tp += Math.round(num * 60); // Converte le ore decimali in minuti
+                    }
                 }
             }
-            document.getElementById('totOre').innerText = minToHHMM(tm); document.getElementById('totPermessi').innerText = minToHHMM(tp)+"h";
-            document.getElementById('totFerie').innerText = tf+"g"; document.getElementById('totMalattia').innerText = tmal+"g";
         }
+    }
+    
+    // Aggiorna la grafica nel footer
+    document.getElementById('totOre').innerText = minToHHMM(tm); 
+    document.getElementById('totPermessi').innerText = minToHHMM(tp) + "h";
+    document.getElementById('totFerie').innerText = tf + "g"; 
+    document.getElementById('totMalattia').innerText = tmal + "g";
+}
+
         
         function apriTredicesima() { toggleMainTitle(false); document.getElementById('selezionePanel').style.display='none'; document.getElementById('bustaPanel').style.display='block'; document.getElementById('bustaMeseTitle').innerText=`(13ª ${currentYear})`; document.getElementById('bustaFeriePermessi').style.display='none'; const d = globalBuste[`${currentYear}_12`]||{}; document.getElementById('inp_stipendio').value=d.stipendio||''; }
         function refreshTredicesimaStatus() { const d = globalBuste[`${document.getElementById('annoSelect').value}_12`]; const b = document.getElementById('btn13esima'); if(d?.stipendio) { b.classList.add('checked'); b.innerHTML=`✅ 13ª: ${formatMoney(d.stipendio)}`; } else { b.classList.remove('checked'); b.innerHTML=`🎁 13ª Mensilità`; } }
