@@ -326,14 +326,31 @@
 
             
             <div id="bustaPanel">
-                <h3 style="text-align:center; color:#555;">Dati Busta Paga <span id="bustaMeseTitle"></span></h3>
-                <div class="busta-row"><label class="busta-label">Stipendio Netto (€)</label><input type="number" step="0.01" id="inp_stipendio" class="busta-input" placeholder="0,00" onchange="salvaBusta()"></div>
-                <div id="bustaFeriePermessi">
-                    <div class="busta-row"><label class="busta-label">Residuo Ferie (Ore)</label><div class="busta-input-group"><input type="number" step="0.01" id="inp_ferie_residue" class="busta-input" placeholder="0,00" onkeyup="calcolaConversione(this.value, 'out_ferie')" onchange="salvaBusta()"><span id="out_ferie" class="busta-conversion">-</span></div></div>
-                    <div class="busta-row"><label class="busta-label">Residuo Permessi (Ore)</label><div class="busta-input-group"><input type="number" step="0.01" id="inp_permessi_residue" class="busta-input" placeholder="0,00" onkeyup="calcolaConversione(this.value, 'out_permessi')" onchange="salvaBusta()"><span id="out_permessi" class="busta-conversion">-</span></div></div>
-                </div>
-                <button class="btn-mese" onclick="chiudiBusta()" style="width:100%; margin-top:20px;">Chiudi</button>
+    <h3 style="text-align:center; color:#555;">Dati Busta Paga <span id="bustaMeseTitle"></span></h3>
+    <div class="busta-row">
+        <label class="busta-label">Stipendio Netto (€)</label>
+        <input type="number" step="0.01" id="inp_stipendio" class="busta-input" placeholder="0,00" onchange="salvaBusta()">
+    </div>
+    <div id="bustaFeriePermessi">
+        <!-- MODIFICATO: Ferie in Giorni (gg) -->
+        <div class="busta-row">
+            <label class="busta-label">Residuo Ferie (gg)</label>
+            <div class="busta-input-group">
+                <input type="number" step="0.01" id="inp_ferie_residue" class="busta-input" placeholder="0,00" onkeyup="calcolaFerieVisive(this.value)" onchange="salvaBusta()">
+                <span id="out_ferie" class="busta-conversion">-</span>
             </div>
+        </div>
+        <!-- MODIFICATO: Permessi in Ore, con conversione HH:MM -->
+        <div class="busta-row">
+            <label class="busta-label">Residuo Permessi (Ore)</label>
+            <div class="busta-input-group">
+                <input type="number" step="0.01" id="inp_permessi_residue" class="busta-input" placeholder="0,00" onkeyup="calcolaPermessiVisivi(this.value)" onchange="salvaBusta()">
+                <span id="out_permessi" class="busta-conversion">-</span>
+            </div>
+        </div>
+    </div>
+    <button class="btn-mese" onclick="chiudiBusta()" style="width:100%; margin-top:20px;">Chiudi</button>
+</div>
 
             <div id="statsPanel">
                 <div class="scheda-header"><h3 style="margin:0;">📊 Statistiche Assenze</h3><button class="btn-close" onclick="chiudiStats()">Chiudi</button></div>
@@ -524,7 +541,8 @@
     // --- FINE PRIMA PARTE ---
 
 
-        window.salvaConfig = salvaConfig; window.salvaBusta = salvaBusta; window.calcolaConversione = calcolaConversione;
+        window.salvaConfig = salvaConfig; window.salvaBusta = salvaBusta; 
+		window.calcolaFerieVisive = calcolaFerieVisive; window.calcolaPermessiVisivi = calcolaPermessiVisivi;
         window.mostraRiepilogoStipendi = mostraRiepilogoStipendi; window.chiudiRiepilogoStipendi = chiudiRiepilogoStipendi;
         window.apriTredicesima = apriTredicesima; window.apriStats = apriStats; window.chiudiStats = chiudiStats;
         window.apriConfig = apriConfig; window.gestisciAnnoMain = gestisciAnnoMain; window.gestisciAnnoStats = gestisciAnnoStats;
@@ -700,6 +718,40 @@
         alert("Errore durante il caricamento dati: " + e.message);
     }
 }
+
+
+
+function calcolaPermessiVisivi(v) { 
+    let o = parseFloat(v) || 0; 
+    if (o > 0) {
+        let h = Math.floor(o);
+        let m = Math.round((o - h) * 60);
+        document.getElementById('out_permessi').innerText = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`; 
+    } else {
+        document.getElementById('out_permessi').innerText = "-";
+    }
+}
+
+function calcolaFerieVisive(v) { 
+    let o = parseFloat(v) || 0; 
+    document.getElementById('out_ferie').innerText = o > 0 ? `${o} gg` : "-"; 
+}
+
+function apriBusta() { 
+    document.getElementById('schedaMese').style.display = 'none'; 
+    document.getElementById('bustaPanel').style.display = 'block'; 
+    document.getElementById('bustaMeseTitle').innerText = `(${nomiMesi[currentMonth]})`; 
+    document.getElementById('bustaFeriePermessi').style.display = 'block'; 
+    
+    const d = globalBuste[`${currentYear}_${currentMonth}`] || {}; 
+    document.getElementById('inp_stipendio').value = d.stipendio || ''; 
+    document.getElementById('inp_ferie_residue').value = d.ferie || ''; 
+    document.getElementById('inp_permessi_residue').value = d.permessi || ''; 
+    
+    calcolaFerieVisive(d.ferie); 
+    calcolaPermessiVisivi(d.permessi); 
+}
+
 
 
         function getConfig() { return globalConfig; }
@@ -1161,8 +1213,21 @@ function creaTotDiv(posizione, hhmm, label) {
         function apriTredicesima() { toggleMainTitle(false); document.getElementById('selezionePanel').style.display='none'; document.getElementById('bustaPanel').style.display='block'; document.getElementById('bustaMeseTitle').innerText=`(13ª ${currentYear})`; document.getElementById('bustaFeriePermessi').style.display='none'; const d = globalBuste[`${currentYear}_12`]||{}; document.getElementById('inp_stipendio').value=d.stipendio||''; }
         function refreshTredicesimaStatus() { const d = globalBuste[`${document.getElementById('annoSelect').value}_12`]; const b = document.getElementById('btn13esima'); if(d?.stipendio) { b.classList.add('checked'); b.innerHTML=`✅ 13ª: ${formatMoney(d.stipendio)}`; } else { b.classList.remove('checked'); b.innerHTML=`🎁 13ª Mensilità`; } }
         function checkBustaStatus() { if(currentMonth===12) return; const d = globalBuste[`${currentYear}_${currentMonth}`]; const b=document.getElementById('btnBustaMain'); if(d?.stipendio) { b.className="btn-busta busta-ok"; b.innerHTML=`✅ Busta: ${formatMoney(d.stipendio)}`; } else { b.className="btn-busta busta-missing"; b.innerHTML="💶 Inserisci Dati Busta Paga"; } }
-        function apriBusta() { document.getElementById('schedaMese').style.display='none'; document.getElementById('bustaPanel').style.display='block'; document.getElementById('bustaMeseTitle').innerText=`(${nomiMesi[currentMonth]})`; document.getElementById('bustaFeriePermessi').style.display='block'; const d = globalBuste[`${currentYear}_${currentMonth}`]||{}; document.getElementById('inp_stipendio').value=d.stipendio||''; document.getElementById('inp_ferie_residue').value=d.ferie||''; document.getElementById('inp_permessi_residue').value=d.permessi||''; calcolaConversione(d.ferie,'out_ferie'); calcolaConversione(d.permessi,'out_permessi'); }
-
+        window.apriBusta = function() { 
+    document.getElementById('schedaMese').style.display = 'none'; 
+    document.getElementById('bustaPanel').style.display = 'block'; 
+    document.getElementById('bustaMeseTitle').innerText = `(${nomiMesi[currentMonth]})`; 
+    document.getElementById('bustaFeriePermessi').style.display = 'block'; 
+    
+    const d = globalBuste[`${currentYear}_${currentMonth}`] || {}; 
+    document.getElementById('inp_stipendio').value = d.stipendio || ''; 
+    document.getElementById('inp_ferie_residue').value = d.ferie || ''; 
+    document.getElementById('inp_permessi_residue').value = d.permessi || ''; 
+    
+    // Richiamo le nuove funzioni per formattare i valori all'apertura del pannello
+    if (typeof window.calcolaFerieVisive === 'function') window.calcolaFerieVisive(d.ferie); 
+    if (typeof window.calcolaPermessiVisivi === 'function') window.calcolaPermessiVisivi(d.permessi); 
+};
 
         async function salvaBusta() { 
     const s = document.getElementById('inp_stipendio').value;
@@ -1180,7 +1245,23 @@ function creaTotDiv(posizione, hhmm, label) {
     chiudiBusta(); 
 }
 
-        function calcolaConversione(v, id) { let o=parseFloat(v)||0; document.getElementById(id).innerText = o>0 ? `${Math.floor(o/8)}g ${(o%8).toFixed(2)}h` : "-"; }
+        // Nuova conversione Permessi (es. 33 -> "33:00")
+window.calcolaPermessiVisivi = function(v) { 
+    let o = parseFloat(v) || 0; 
+    if (o > 0) {
+        let h = Math.floor(o);
+        let m = Math.round((o - h) * 60);
+        document.getElementById('out_permessi').innerText = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`; 
+    } else {
+        document.getElementById('out_permessi').innerText = "-";
+    }
+};
+
+// Nuova conversione Ferie (es. 5 -> "5 gg")
+window.calcolaFerieVisive = function(v) { 
+    let o = parseFloat(v) || 0; 
+    document.getElementById('out_ferie').innerText = o > 0 ? `${o} gg` : "-"; 
+};
         
         function apriConfig() { toggleMainTitle(false); document.getElementById('selezionePanel').style.display='none'; document.getElementById('configPanel').style.display='block'; document.getElementById('cfg_pausa').value=globalConfig.pausa||"00:00"; const c=document.getElementById('daysConfigWrapper'); c.innerHTML=''; [1,2,3,4,5,6,0].forEach(d=>{ c.innerHTML+=`<div class="config-row"><span>${giorniSett[d]}</span><input type="time" id="cfg_day_${d}" class="config-input" value="${globalConfig[d]||'00:00'}"></div>`; }); }
         async function salvaConfig() { const n={}; [0,1,2,3,4,5,6].forEach(i=>n[i]=document.getElementById(`cfg_day_${i}`).value); n.pausa=document.getElementById('cfg_pausa').value; await saveConfigData(n); document.getElementById('configPanel').style.display='none'; document.getElementById('selezionePanel').style.display='block'; toggleMainTitle(true); }
