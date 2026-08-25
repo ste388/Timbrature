@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-
-<!-- PWA SETTINGS -->
+    <!-- PWA SETTINGS -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#007bff">
     <link rel="apple-touch-icon" href="icons/192.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro Ore Cloud</title>
@@ -57,68 +55,39 @@
         .assenze-row { display: flex; gap: 10px; align-items: center; margin-bottom: 5px; }
         .assenze-select { flex: 2; height: 36px; padding: 0 10px; border-radius: 4px; border: 1px solid #ccc; font-size: 0.95rem; box-sizing: border-box; }
         .assenze-qty { width: 60px; height: 36px; padding: 5px; border-radius: 4px; border: 1px solid #ccc; text-align: center; box-sizing: border-box; font-size: 1rem; font-family: monospace; }
+        
         /* --- FOOTER TOTALI (PC) --- */
-#footerTotali {
-    position: sticky;
-    bottom: 0;
-    background: #fff;
-    border-top: 1px solid #ddd;
-    display: none; /* Si attiva via JS */
-    justify-content: space-around;
-    padding: 10px 5px;
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-    z-index: 100;
-}
+        #footerTotali {
+            position: sticky;
+            bottom: 0;
+            background: #fff;
+            border-top: 1px solid #ddd;
+            display: none; /* Si attiva via JS */
+            justify-content: space-around;
+            padding: 10px 5px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
 
-.tot-box {
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    flex: 1; /* Distribuisce spazio uguale */
-}
+        .tot-box {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            flex: 1; /* Distribuisce spazio uguale */
+        }
 
-.tot-val {
-    font-size: 1.1rem;
-    font-weight: bold;
-    color: #333;
-}
+        .tot-val { font-size: 1.1rem; font-weight: bold; color: #333; display: block; margin-bottom: 2px; font-family: monospace; }
+        .tot-label { font-size: 0.75rem; color: #777; margin-top: 2px; text-transform: uppercase; opacity: 0.8;}
 
-.tot-label {
-    font-size: 0.75rem;
-    color: #777;
-    margin-top: 2px;
-}
+        /* --- FOOTER MOBILE (Griglia 2x2) --- */
+        @media screen and (max-width: 600px) {
+            #footerTotali { flex-wrap: wrap; padding: 5px; gap: 5px; }
+            .tot-box { flex: 1 1 45%; border: 1px solid #f0f0f0; border-radius: 5px; padding: 4px; background: #fafafa; }
+            .tot-val { font-size: 1rem; }
+            .tot-label { font-size: 0.7rem; }
+        }
 
-/* --- FOOTER MOBILE (Griglia 2x2) --- */
-@media screen and (max-width: 600px) {
-    #footerTotali {
-        display: none; /* Gestito da JS, ma qui definiamo il layout */
-        /* Usiamo Grid o Flex-Wrap per fare 2 righe */
-        flex-wrap: wrap; 
-        padding: 5px;
-        gap: 5px; /* Spazio tra le righe */
-    }
-
-    .tot-box {
-        flex: 1 1 45%; /* Ogni box prende il 45% (quindi 2 per riga) */
-        border: 1px solid #f0f0f0; /* Opzionale: cornicetta leggera */
-        border-radius: 5px;
-        padding: 4px;
-        background: #fafafa;
-    }
-
-    /* Riduciamo leggermente il font per sicurezza */
-    .tot-val { font-size: 1rem; }
-    .tot-label { font-size: 0.7rem; }
-    
-    /* Opzionale: riduci le etichette solo su mobile se vuoi */
-    /* .tot-label span { display: none; } se volessi nascondere testo */
-}
-
-        .tot-box { text-align: center; }
-        .tot-val { display: block; font-weight: bold; font-size: 1.1rem; margin-bottom: 2px; font-family: monospace; }
-        .tot-label { font-size: 0.75rem; opacity: 0.8; text-transform: uppercase; }
         #selezionePanel { text-align: center; margin-top: 20px; }
         select.main-select { font-size: 1.2rem; padding: 8px 20px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #ccc; background-color: #fff; cursor: pointer; width: 80%; }
         .stats-controls { margin-bottom: 20px; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #ddd; }
@@ -145,133 +114,32 @@
         .row-sabato .giorno-label { color: #f57f17; font-weight: bold; }
         .stats-result-list { list-style: none; padding: 0; margin: 0; }
         .stats-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
-        .busta-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-    gap: 10px; /* Spazio tra etichetta e input */
-}
-/* Etichetta (es. "Residuo Ferie") */
-.busta-label {
-    flex: 1; /* Prende lo spazio necessario */
-    font-size: 0.95rem;
-    color: #555;
-    white-space: nowrap; /* Evita che vada a capo se possibile */
-}
-        /* Gruppo Input + Testo Conversione */
-.busta-input-group {
-    flex: 1; /* Prende il resto dello spazio (metà riga circa) */
-    display: flex;
-    align-items: center;
-    gap: 8px; /* Spazio tra casella bianca e testo grigio */
-    justify-content: flex-end; /* Allinea tutto a destra */
-}
- .busta-input { flex: 1; padding: 10px; font-size: 1.1rem; border: 1px solid #ccc; border-radius: 6px; text-align: right; }
+        .busta-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 10px; }
+        .busta-label { flex: 1; font-size: 0.95rem; color: #555; white-space: nowrap; }
+        .busta-input-group { flex: 1; display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+        .busta-input { width: 70px; padding: 6px; font-size: 1rem; border: 1px solid #ccc; border-radius: 4px; text-align: right; }
         button.btn-busta { margin-top: 10px; padding: 12px; width: 100%; color: white; border: none; border-radius: 8px; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .busta-missing { background-color: #dc3545; animation: pulse 2s infinite; } .busta-ok { background-color: #28a745; }
         #loadingOverlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.9); z-index:9999; display:flex; justify-content:center; align-items:center; flex-direction:column; font-weight:bold; color:#007bff; }
-		
-		/* Casella input numerica */
-.busta-input {
-    width: 70px; /* Larghezza fissa e compatta */
-    padding: 6px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    text-align: right;
-    font-size: 1rem;
-}
-
-/* Testo conversione (es. "12g 2.52h") */
-.busta-conversion {
-    font-size: 0.85rem;
-    color: #666;
-    font-weight: bold;
-    white-space: nowrap; /* Fondamentale: non va a capo! */
-    min-width: 80px; /* Riserva spazio per evitare salti */
-}
-		
-		/* --- STILE MOBILE OTTIMIZZATO --- */
-		@media screen and (max-width: 400px) {
-    .busta-label { font-size: 0.85rem; }
-    .busta-input { width: 60px; font-size: 0.9rem; }
-    .busta-conversion { font-size: 0.75rem; }
-}
-		
-@media screen and (max-width: 768px) {
-    
-    /* 1. RIDUCIAMO IL CONTENITORE PRINCIPALE */
-    .container {
-        padding: 5px; /* Meno bordo bianco */
-        width: 100%;
-        max-width: 100%;
-        box-shadow: none; /* Togliamo l'ombra per guadagnare pixel */
-    }
-
-    /* 2. TABELLA GIORNI PIÙ COMPATTA */
-    /* Riduciamo il font e lo spazio interno delle righe */
-    .giorno-row {
-        padding: 8px 4px; /* Meno padding laterale */
-        font-size: 0.85rem; /* Testo più piccolo */
-        gap: 5px; /* Meno spazio tra gli elementi */
-    }
-
-    /* 3. COLONNA DATA */
-    .giorno-label {
-        width: 35px; /* Fissa larghezza minima */
-        font-size: 0.75rem; /* Data piccolina */
-        line-height: 1.1; /* Righe vicine */
-        white-space: normal; /* Permetti a capo se serve */
-    }
-
-    /* 4. COLONNA "PREVISTE" */
-    /* Spesso inutile su mobile, la rimpiccioliamo o nascondiamo se vuoi */
-    .giorno-previsto {
-        font-size: 0.7rem;
-        color: #999;
-        width: 35px; 
-    }
-
-    /* 5. INPUT ORE (Il colpevole principale) */
-    .input-group-ore {
-        flex-grow: 1; /* Prende tutto lo spazio disponibile */
-        gap: 2px;
-    }
-
-    .giorno-input {
-        width: 50px !important; /* Forza larghezza fissa */
-        padding: 5px 2px;
-        font-size: 0.9rem;
-        text-align: center;
-    }
-    
-    /* Tasto Orologio più compatto */
-    .btn-clock {
-        padding: 5px 8px;
-        font-size: 1rem;
-    }
-
-    /* 6. BOTTONE ASSENZE (Quello che sballa coi permessi) */
-    .btn-extra {
-        width: 45px; /* Larghezza fissa per non spaccare la riga */
-        height: 34px;
-        font-size: 0.7rem; /* Testo piccolissimo per far stare "PERMESSO" */
-        padding: 2px;
-        line-height: 1;
-        overflow: hidden; /* Se sfora, taglia invece di allargare */
-        white-space: normal; /* Permetti "PERM<br>2h" */
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-    }
-    
-    /* Se c'è testo lungo come "Permesso", usiamo abbreviazioni via CSS */
-    /* Nota: Questo richiede modifiche al JS se vuoi farlo perfetto, 
-       ma intanto il CSS overflow:hidden impedisce che spacchi tutto */
-}
-
-		
+        .busta-conversion { font-size: 0.85rem; color: #666; font-weight: bold; white-space: nowrap; min-width: 80px; }
+        
+        /* --- STILE MOBILE OTTIMIZZATO --- */
+        @media screen and (max-width: 400px) {
+            .busta-label { font-size: 0.85rem; }
+            .busta-input { width: 60px; font-size: 0.9rem; }
+            .busta-conversion { font-size: 0.75rem; }
+        }
+        
+        @media screen and (max-width: 768px) {
+            .container { padding: 5px; width: 100%; max-width: 100%; box-shadow: none; }
+            .giorno-row { padding: 8px 4px; font-size: 0.85rem; gap: 5px; }
+            .giorno-label { width: 35px; font-size: 0.75rem; line-height: 1.1; white-space: normal; }
+            .giorno-previsto { font-size: 0.7rem; color: #999; width: 35px;  }
+            .input-group-ore { flex-grow: 1; gap: 2px; }
+            .giorno-input { width: 50px !important; padding: 5px 2px; font-size: 0.9rem; text-align: center; }
+            .btn-clock { padding: 5px 8px; font-size: 1rem; }
+            .btn-extra { width: 45px; height: 34px; font-size: 0.7rem; padding: 2px; line-height: 1; overflow: hidden; white-space: normal; display: flex; align-items: center; justify-content: center; text-align: center; }
+        }
     </style>
 </head>
 <body>
@@ -291,150 +159,137 @@
     </div>
 </div>
 
-<!-- Aggiungi anche un bottone di Logout da qualche parte nel tuo HTML principale, ad esempio vicino al titolo -->
-<!-- <button onclick="logoutApp()" style="background:#dc3545; color:white; padding:5px 10px; border:none; border-radius:4px;">Esci</button> -->
-
-
-    <div id="loadingOverlay">
-        <div style="font-size:3rem;">☁️</div>
-        <div>Sincronizzazione Cloud...</div>
-    </div>
-
-    <div class="container">
-        <!-- CONTENUTO -->
-        <h1 id="mainTitle">Registro Ore Cloud</h1>
-
-        <div class="content-scrollable">
-            <div id="configPanel">
-                <h3 style="text-align:center; color:#555;">Imposta Orari Obbligatori (HH:MM)</h3>
-                <div id="configContainer">
-                    <div class="config-row" style="background-color:#e3f2fd; border-radius:8px; margin-bottom:15px; border:1px solid #90caf9;">
-                        <span style="font-weight:bold; color:#0d47a1;">Pausa Pranzo Obbligatoria</span>
-                        <input type="time" id="cfg_pausa" class="config-input" value="00:00">
-                    </div>
-                    <div id="daysConfigWrapper"></div>
-                </div>
-                
-                <br>
-                
-                <!-- PULSANTIERA -->
-                <div style="display:flex; flex-direction:column; gap:10px;">
-                    <button class="btn-mese" onclick="salvaConfig()" style="background-color:#28a745; width:100%;">💾 Salva Modifiche</button>
-                    <button class="btn-mese" onclick="chiudiConfig()" style="background-color:#6c757d; width:100%;">⬅️ Indietro</button>
-                </div>
-            </div>
-
-            
-            <div id="bustaPanel">
-    <h3 style="text-align:center; color:#555;">Dati Busta Paga <span id="bustaMeseTitle"></span></h3>
-    <div class="busta-row">
-        <label class="busta-label">Stipendio Netto (€)</label>
-        <input type="number" step="0.01" id="inp_stipendio" class="busta-input" placeholder="0,00" onchange="salvaBusta()">
-    </div>
-    <div id="bustaFeriePermessi">
-        <!-- MODIFICATO: Ferie in Giorni (gg) -->
-        <div class="busta-row">
-            <label class="busta-label">Residuo Ferie (gg)</label>
-            <div class="busta-input-group">
-                <input type="number" step="0.01" id="inp_ferie_residue" class="busta-input" placeholder="0,00" onkeyup="calcolaFerieVisive(this.value)" onchange="salvaBusta()">
-                <span id="out_ferie" class="busta-conversion">-</span>
-            </div>
-        </div>
-        <!-- MODIFICATO: Permessi in Ore, con conversione HH:MM -->
-        <div class="busta-row">
-            <label class="busta-label">Residuo Permessi (Ore)</label>
-            <div class="busta-input-group">
-                <input type="number" step="0.01" id="inp_permessi_residue" class="busta-input" placeholder="0,00" onkeyup="calcolaPermessiVisivi(this.value)" onchange="salvaBusta()">
-                <span id="out_permessi" class="busta-conversion">-</span>
-            </div>
-        </div>
-    </div>
-    <button class="btn-mese" onclick="chiudiBusta()" style="width:100%; margin-top:20px;">Chiudi</button>
+<div id="loadingOverlay">
+    <div style="font-size:3rem;">☁️</div>
+    <div>Sincronizzazione Cloud...</div>
 </div>
 
-            <div id="statsPanel">
-                <div class="scheda-header"><h3 style="margin:0;">📊 Statistiche Assenze</h3><button class="btn-close" onclick="chiudiStats()">Chiudi</button></div>
-                <div class="stats-controls">
-                    <div class="stats-grid-row">
-                        <div class="filter-box">
-                            <span class="filter-label">Anno Riferimento</span>
-                            <select id="statsAnno" class="modern-select" onchange="gestisciAnnoStats(this)"></select>
-                        </div>
-                        <div class="filter-box">
-                            <span class="filter-label">Tipo Assenza</span>
-                            <select id="statsTipo" class="modern-select" onchange="calcolaStats()">
-                                <option value="Ferie">Ferie</option>
-                                <option value="Malattia">Malattia</option>
-                                <option value="Permesso">Permesso</option>
-                                <option value="Festivo">Festivo</option>
-                            </select>
-                        </div>
-                    </div>
-                    <button class="btn-mese" onclick="mostraRiepilogoStipendi()" style="margin-top:5px; width:100%; background-color:#17a2b8;">💰 Riepilogo Stipendi</button>
+<div class="container">
+    <h1 id="mainTitle">Registro Ore Cloud <button onclick="logoutApp()" style="background:#dc3545; color:white; padding:5px 10px; border:none; border-radius:4px; font-size: 0.8rem; float: right; margin-top: 5px;">Esci</button></h1>
+
+    <div class="content-scrollable">
+        <div id="configPanel">
+            <h3 style="text-align:center; color:#555;">Imposta Orari Obbligatori (HH:MM)</h3>
+            <div id="configContainer">
+                <div class="config-row" style="background-color:#e3f2fd; border-radius:8px; margin-bottom:15px; border:1px solid #90caf9;">
+                    <span style="font-weight:bold; color:#0d47a1;">Pausa Pranzo Obbligatoria</span>
+                    <input type="time" id="cfg_pausa" class="config-input" value="00:00">
                 </div>
-                <ul id="statsList" class="stats-result-list"></ul>
-                <div id="statsTotal" class="tot-box" style="margin-top:20px; color:#333; font-size:1.2rem;"></div>
+                <div id="daysConfigWrapper"></div>
             </div>
-
-            <div id="selezionePanel">
-                <select id="annoSelect" class="main-select" onchange="gestisciAnnoMain(this)"></select>
-                <div class="mesi-grid" id="mesiContainer"></div>
-                <button class="btn-13" id="btn13esima" onclick="apriTredicesima()"><span>🎁 13ª Mensilità</span></button>
-                <button class="btn-stats" onclick="apriStats()">📊 Statistiche</button>
-                <button class="btn-config" onclick="apriConfig()">⚙️ Modifica Orari Obbligatori</button>
-				<!-- NUOVO TASTO UTILITÀ -->
-				<button class="btn-config" onclick="apriUtility()" style="background-color:#6c757d; margin-top:5px;">🛠️ Utilità Dati (Export/Import)</button>
-            </div>
-
-            <div id="schedaMese">
-                <div class="scheda-header"><h3 id="titoloMese" style="margin:0;"></h3><button class="btn-close" onclick="chiudiScheda()">Indietro</button></div>
-                <button id="btnBustaMain" class="btn-busta busta-missing" onclick="apriBusta()" style="margin-bottom:15px;">💶 Inserisci Dati Busta Paga</button>
-                <div id="headerTabella"><span>Giorno</span><span style="text-align:center;">Prev.</span><span style="text-align:center;">Fatte</span><span style="text-align:center;">Note</span></div>
-                <div id="giorniContainer"></div>
+            <br>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <button class="btn-mese" onclick="salvaConfig()" style="background-color:#28a745; width:100%;">💾 Salva Modifiche</button>
+                <button class="btn-mese" onclick="chiudiConfig()" style="background-color:#6c757d; width:100%;">⬅️ Indietro</button>
             </div>
         </div>
 
-        <div id="footerTotali">
-            <div class="tot-box"><span class="tot-val" id="totOre">0</span><span class="tot-label">Ore Lav.</span></div>
-            <div class="tot-box" style="color:#ffc107;"><span class="tot-val" id="totPermessi">0</span><span class="tot-label">Permessi</span></div>
-            <div class="tot-box" style="color:#4db6ac;"><span class="tot-val" id="totFerie">0</span><span class="tot-label">Ferie (gg)</span></div>
-            <div class="tot-box" style="color:#e57373;"><span class="tot-val" id="totMalattia">0</span><span class="tot-label">Malattia (gg)</span></div>
+        <div id="bustaPanel">
+            <h3 style="text-align:center; color:#555;">Dati Busta Paga <span id="bustaMeseTitle"></span></h3>
+            <div class="busta-row">
+                <label class="busta-label">Stipendio Netto (€)</label>
+                <input type="number" step="0.01" id="inp_stipendio" class="busta-input" placeholder="0,00" onchange="salvaBusta()">
+            </div>
+            <div id="bustaFeriePermessi">
+                <div class="busta-row">
+                    <label class="busta-label">Residuo Ferie (gg)</label>
+                    <div class="busta-input-group">
+                        <input type="number" step="0.01" id="inp_ferie_residue" class="busta-input" placeholder="0,00" onkeyup="calcolaFerieVisive(this.value)" onchange="salvaBusta()">
+                        <span id="out_ferie" class="busta-conversion">-</span>
+                    </div>
+                </div>
+                <div class="busta-row">
+                    <label class="busta-label">Residuo Permessi (Ore)</label>
+                    <div class="busta-input-group">
+                        <input type="number" step="0.01" id="inp_permessi_residue" class="busta-input" placeholder="0,00" onkeyup="calcolaPermessiVisivi(this.value)" onchange="salvaBusta()">
+                        <span id="out_permessi" class="busta-conversion">-</span>
+                    </div>
+                </div>
+            </div>
+            <button class="btn-mese" onclick="chiudiBusta()" style="width:100%; margin-top:20px;">Chiudi</button>
+        </div>
+
+        <div id="statsPanel">
+            <div class="scheda-header"><h3 style="margin:0;">📊 Statistiche Assenze</h3><button class="btn-close" onclick="chiudiStats()">Chiudi</button></div>
+            <div class="stats-controls">
+                <div class="stats-grid-row">
+                    <div class="filter-box">
+                        <span class="filter-label">Anno Riferimento</span>
+                        <select id="statsAnno" class="modern-select" onchange="gestisciAnnoStats(this)"></select>
+                    </div>
+                    <div class="filter-box">
+                        <span class="filter-label">Tipo Assenza</span>
+                        <select id="statsTipo" class="modern-select" onchange="calcolaStats()">
+                            <option value="Ferie">Ferie</option>
+                            <option value="Malattia">Malattia</option>
+                            <option value="Permesso">Permesso</option>
+                            <option value="Festivo">Festivo</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn-mese" onclick="mostraRiepilogoStipendi()" style="margin-top:5px; width:100%; background-color:#17a2b8;">💰 Riepilogo Stipendi</button>
+            </div>
+            <ul id="statsList" class="stats-result-list"></ul>
+            <div id="statsTotal" class="tot-box" style="margin-top:20px; color:#333; font-size:1.2rem;"></div>
+        </div>
+
+        <div id="selezionePanel">
+            <select id="annoSelect" class="main-select" onchange="gestisciAnnoMain(this)"></select>
+            <div class="mesi-grid" id="mesiContainer"></div>
+            <button class="btn-13" id="btn13esima" onclick="apriTredicesima()"><span>🎁 13ª Mensilità</span></button>
+            <button class="btn-stats" onclick="apriStats()">📊 Statistiche</button>
+            <button class="btn-config" onclick="apriConfig()">⚙️ Modifica Orari Obbligatori</button>
+            <button class="btn-config" onclick="apriUtility()" style="background-color:#6c757d; margin-top:5px;">🛠️ Utilità Dati (Export/Import)</button>
+        </div>
+
+        <div id="schedaMese">
+            <div class="scheda-header"><h3 id="titoloMese" style="margin:0;"></h3><button class="btn-close" onclick="chiudiScheda()">Indietro</button></div>
+            <button id="btnBustaMain" class="btn-busta busta-missing" onclick="apriBusta()" style="margin-bottom:15px;">💶 Inserisci Dati Busta Paga</button>
+            <div id="headerTabella"><span>Giorno</span><span style="text-align:center;">Prev.</span><span style="text-align:center;">Fatte</span><span style="text-align:center;">Note</span></div>
+            <div id="giorniContainer"></div>
         </div>
     </div>
 
-    <!-- MODALE TIMBRATURA -->
-    <div id="timbraturaModal">
-        <div class="modal-content">
-            <h3 class="modal-title">Inserisci Orari</h3>
-            <div class="time-row">
-                <span class="time-label">Mattina</span>
-                <div class="time-input-wrapper"><input type="time" id="t_in1" class="time-input" onchange="updateSummary()"><button class="btn-now" onclick="setNow('t_in1')">⏱</button></div>
-                <div class="time-input-wrapper"><input type="time" id="t_out1" class="time-input" onchange="updateSummary()"><button class="btn-now" onclick="setNow('t_out1')">⏱</button></div>
-            </div>
-            <div class="time-row">
-                <span class="time-label">Pomeriggio</span>
-                <div class="time-input-wrapper"><input type="time" id="t_in2" class="time-input" onchange="updateSummary()"><button class="btn-now" onclick="setNow('t_in2')">⏱</button></div>
-                <div class="time-input-wrapper"><input type="time" id="t_out2" class="time-input" onchange="updateSummary()"><button class="btn-now" onclick="setNow('t_out2')">⏱</button></div>
-            </div>
-            <div id="suggestionBox" class="suggestion-box"><span class="suggestion-text">✨ Per fare le ore previste esci alle:</span><span id="suggestionTime" class="suggestion-time">--:--</span></div>
-            <div class="modal-summary">
-                <div class="summary-row"><span>Tot. Mattina:</span><span id="sum_mattina" class="summary-val">00:00</span></div>
-                <div class="summary-row"><span>Pausa Pranzo:</span><span id="sum_pranzo" class="summary-val lunch">00:00</span></div>
-                <div class="summary-row" id="row_penalty" style="display:none; color:#dc3545; font-size:0.9rem;"><span>⚠️ Pausa Minima:</span><span id="sum_penalty" class="summary-val penalty" style="font-weight:bold;">-0 min</span></div>
-                <div class="summary-row"><span>Tot. Pomeriggio:</span><span id="sum_pomeriggio" class="summary-val">00:00</span></div>
-                <div style="margin-top:10px; border-top:1px dashed #ccc; padding-top:5px; text-align:right;"><span style="font-size:1.1rem; color:#333;">Totale Giornaliero: </span><span id="sum_totale_def" style="font-size:1.3rem; font-weight:bold; color:#28a745;">00:00</span></div>
-            </div>
-            <input type="hidden" id="current_edit_key"><input type="hidden" id="current_target_minutes">
-            <button class="btn-modal-save" onclick="salvaTimbratura()">Calcola & Salva</button><button class="btn-modal-close" onclick="chiudiModalTime()">Annulla</button>
-        </div>
+    <div id="footerTotali">
+        <div class="tot-box"><span class="tot-val" id="totOre">0</span><span class="tot-label">Ore Lav.</span></div>
+        <div class="tot-box" style="color:#ffc107;"><span class="tot-val" id="totPermessi">0</span><span class="tot-label">Permessi</span></div>
+        <div class="tot-box" style="color:#4db6ac;"><span class="tot-val" id="totFerie">0</span><span class="tot-label">Ferie (gg)</span></div>
+        <div class="tot-box" style="color:#e57373;"><span class="tot-val" id="totMalattia">0</span><span class="tot-label">Malattia (gg)</span></div>
     </div>
-	
-	<!-- MODALE UTILITÀ DATI -->
+</div>
+
+<!-- MODALE TIMBRATURA -->
+<div id="timbraturaModal">
+    <div class="modal-content">
+        <h3 class="modal-title">Inserisci Orari</h3>
+        <div class="time-row">
+            <span class="time-label">Mattina</span>
+            <div class="time-input-wrapper"><input type="time" id="t_in1" class="time-input" onchange="updateSummary()"><button class="btn-now" onclick="setNow('t_in1')">⏱</button></div>
+            <div class="time-input-wrapper"><input type="time" id="t_out1" class="time-input" onchange="updateSummary()"><button class="btn-now" onclick="setNow('t_out1')">⏱</button></div>
+        </div>
+        <div class="time-row">
+            <span class="time-label">Pomeriggio</span>
+            <div class="time-input-wrapper"><input type="time" id="t_in2" class="time-input" onchange="updateSummary()"><button class="btn-now" onclick="setNow('t_in2')">⏱</button></div>
+            <div class="time-input-wrapper"><input type="time" id="t_out2" class="time-input" onchange="updateSummary()"><button class="btn-now" onclick="setNow('t_out2')">⏱</button></div>
+        </div>
+        <div id="suggestionBox" class="suggestion-box"><span class="suggestion-text">✨ Per fare le ore previste esci alle:</span><span id="suggestionTime" class="suggestion-time">--:--</span></div>
+        <div class="modal-summary">
+            <div class="summary-row"><span>Tot. Mattina:</span><span id="sum_mattina" class="summary-val">00:00</span></div>
+            <div class="summary-row"><span>Pausa Pranzo:</span><span id="sum_pranzo" class="summary-val lunch">00:00</span></div>
+            <div class="summary-row" id="row_penalty" style="display:none; color:#dc3545; font-size:0.9rem;"><span>⚠️ Pausa Minima:</span><span id="sum_penalty" class="summary-val penalty" style="font-weight:bold;">-0 min</span></div>
+            <div class="summary-row"><span>Tot. Pomeriggio:</span><span id="sum_pomeriggio" class="summary-val">00:00</span></div>
+            <div style="margin-top:10px; border-top:1px dashed #ccc; padding-top:5px; text-align:right;"><span style="font-size:1.1rem; color:#333;">Totale Giornaliero: </span><span id="sum_totale_def" style="font-size:1.3rem; font-weight:bold; color:#28a745;">00:00</span></div>
+        </div>
+        <input type="hidden" id="current_edit_key"><input type="hidden" id="current_target_minutes">
+        <button class="btn-modal-save" onclick="salvaTimbratura()">Calcola & Salva</button><button class="btn-modal-close" onclick="chiudiModalTime()">Annulla</button>
+    </div>
+</div>
+
+<!-- MODALE UTILITÀ DATI -->
 <div id="utilityModal" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10000; justify-content:center; align-items:center;">
     <div class="modal-content" style="background:white; padding:20px; border-radius:10px; width:90%; max-width:400px; max-height:90vh; overflow-y:auto;">
         <h3 style="text-align:center; border-bottom:1px solid #eee; padding-bottom:10px; margin-top:0;">🛠️ Gestione Dati</h3>
         
-        <!-- SELEZIONE INTERVALLO -->
         <div style="background:#f8f9fa; padding:10px; border-radius:8px; margin-bottom:15px; border:1px solid #eee;">
             <div style="font-weight:bold; margin-bottom:5px; color:#555;">📅 Seleziona Intervallo</div>
             <div style="display:flex; gap:10px;">
@@ -452,14 +307,12 @@
             </div>
         </div>
 
-        <!-- SEZIONE ESPORTA -->
         <div class="util-box" style="margin-bottom:15px; border-left:4px solid #28a745; padding-left:10px;">
             <h4 style="margin:5px 0;">⬇️ Esporta Dati (Backup)</h4>
             <p style="font-size:0.8rem; color:#666; margin-bottom:5px;">Scarica un file sicuro con i tuoi dati per il periodo selezionato.</p>
             <button onclick="esportaDati()" style="width:100%; padding:8px; background:#28a745; color:white; border:none; border-radius:5px; cursor:pointer;">Scarica Backup (.json)</button>
         </div>
 
-        <!-- SEZIONE IMPORTA -->
         <div class="util-box" style="margin-bottom:15px; border-left:4px solid #007bff; padding-left:10px;">
             <h4 style="margin:5px 0;">⬆️ Importa Dati</h4>
             <p style="font-size:0.8rem; color:#666; margin-bottom:5px;">Carica un file backup. I dati esistenti verranno aggiornati.</p>
@@ -467,7 +320,6 @@
             <button onclick="document.getElementById('fileImport').click()" style="width:100%; padding:8px; background:#007bff; color:white; border:none; border-radius:5px; cursor:pointer;">Seleziona File da Caricare</button>
         </div>
 
-        <!-- SEZIONE ELIMINA -->
         <div class="util-box" style="margin-bottom:15px; border-left:4px solid #dc3545; padding-left:10px;">
             <h4 style="margin:5px 0; color:#dc3545;">🗑️ Elimina Definitivamente</h4>
             <p style="font-size:0.8rem; color:#666; margin-bottom:5px;">Attenzione: Cancella TUTTI i dati nel periodo selezionato.</p>
@@ -478,20 +330,17 @@
     </div>
 </div>
 
-	
-    <div id="riepilogoStipendiModal"><div class="modal-content"><h3 class="modal-title" style="border-bottom: 1px solid #eee; padding-bottom:10px;">Riepilogo Stipendi</h3><div id="containerStipendiList"></div><button class="btn-modal-close" onclick="chiudiRiepilogoStipendi()">Chiudi</button></div></div>
+<div id="riepilogoStipendiModal">
+    <div class="modal-content">
+        <h3 class="modal-title" style="border-bottom: 1px solid #eee; padding-bottom:10px;">Riepilogo Stipendi</h3>
+        <div id="containerStipendiList"></div>
+        <button class="btn-modal-close" onclick="chiudiRiepilogoStipendi()">Chiudi</button>
+    </div>
+</div>
 
-   <script type="module">
+<script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    
-    // 1. IMPORT AGGIORNATI (Tolto enableIndexedDbPersistence, messi initializeFirestore e persistentLocalCache)
-    import { 
-        getFirestore, 
-        initializeFirestore, 
-        persistentLocalCache, 
-        collection, doc, getDoc, setDoc, deleteDoc, getDocs, query, where, onSnapshot 
-    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-    
+    import { getFirestore, initializeFirestore, persistentLocalCache, collection, doc, getDoc, setDoc, deleteDoc, getDocs, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     // CONFIGURAZIONE FIREBASE
@@ -510,15 +359,8 @@
 
     try {
         const app = initializeApp(firebaseConfig);
-        
-        // 2. NUOVA INIZIALIZZAZIONE CON CACHE PERSISTENTE (OFFLINE)
-        // Questo sostituisce il vecchio metodo e toglie l'avviso giallo.
-        db = initializeFirestore(app, {
-            localCache: persistentLocalCache()
-        });
-
+        db = initializeFirestore(app, { localCache: persistentLocalCache() });
         auth = getAuth(app); 
-
         console.log("Firebase & Auth initialized (Offline Mode Ready v2)");
     } catch(e) {
         console.error("Firebase init error", e);
@@ -526,46 +368,21 @@
     }
 
     const defaultConfig = { 1: "07:00", 2: "07:00", 3: "08:00", 4: "07:00", 5: "07:00", 6: "00:00", 0: "00:00", pausa: "00:00" }; 
-    // ... il resto del tuo codice prosegue uguale ...
-
-
     let currentYear = new Date().getFullYear();
-    let currentMonth = 0; // Gennaio = 0
+    let currentMonth = 0; 
     let globalDB = {}; 
     let globalBuste = {};
     let globalConfig = defaultConfig;
-
     const nomiMesi = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"];
     const giorniSett = ["Domenica", "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato"];
 
-    // --- FINE PRIMA PARTE ---
-
-
-        window.salvaConfig = salvaConfig; window.salvaBusta = salvaBusta; 
-		window.calcolaFerieVisive = calcolaFerieVisive; window.calcolaPermessiVisivi = calcolaPermessiVisivi;
-        window.mostraRiepilogoStipendi = mostraRiepilogoStipendi; window.chiudiRiepilogoStipendi = chiudiRiepilogoStipendi;
-        window.apriTredicesima = apriTredicesima; window.apriStats = apriStats; window.chiudiStats = chiudiStats;
-        window.apriConfig = apriConfig; window.gestisciAnnoMain = gestisciAnnoMain; window.gestisciAnnoStats = gestisciAnnoStats;
-        window.calcolaStats = calcolaStats; window.apriBusta = apriBusta; window.chiudiScheda = chiudiScheda;
-        window.apriModalTime = apriModalTime; window.chiudiModalTime = chiudiModalTime; window.updateSummary = updateSummary;
-        window.setNow = setNow; window.salvaTimbratura = salvaTimbratura; window.salvaTutto = salvaTutto;
-        window.toggleAssenze = toggleAssenze; window.gestisciInputAssenza = gestisciInputAssenza; window.confermaAssenza = confermaAssenza;
-        window.apriMese = apriMese;
-
-            // --- GESTIONE AUTH & AVVIO ---
-
-    // Funzione che fa partire l'app (quello che faceva prima window.onload)
+    // --- GESTIONE AUTH E INIZIALIZZAZIONE ---
     async function avviaApplicazione(user) {
         console.log("Utente loggato:", user.email);
-        currentUser = user; // Salviamo l'utente nella variabile globale
-        
-        // Nascondiamo il login
+        currentUser = user; 
         document.getElementById('loginContainer').style.display = 'none'; 
-        
-        // Mostriamo il loading (opzionale, se vuoi)
         document.getElementById('loadingOverlay').style.display = 'flex';
 
-        // --- IL TUO VECCHIO CODICE DI AVVIO ---
         await syncAllData(); 
         popolaAnniTutti(); 
         generaBottoniMesi(); 
@@ -576,1106 +393,801 @@
         apriMese(currentMonth);
         
         document.getElementById('loadingOverlay').style.display = 'none';
-		
-		    // ... codice precedente di avviaApplicazione ...
-    document.getElementById('loadingOverlay').style.display = 'none';
 
-    // --- APERTURA AUTOMATICA OGGI ---
-    // Usiamo un setTimeout brevissimo solo per essere certi che il DOM sia pronto
-    setTimeout(() => {
-        // 1. Calcola la chiave di oggi
-        const today = new Date();
-        const y = today.getFullYear();
-        const m = String(today.getMonth() + 1).padStart(2, '0');
-        const d = String(today.getDate()).padStart(2, '0');
-        const oggiKey = `${y}-${m}-${d}`;
-        
-        console.log("Apro automaticamente:", oggiKey);
-
-        // 2. Chiama la funzione UFFICIALE che abbiamo trovato nel codice
-        // Nota: Assicurati che apriModalTime sia globale. 
-        // Se è definita dentro un modulo, devi aver aggiunto "window.apriModalTime = apriModalTime"
-        // Se non l'hai fatto, usa il trucco del click sul bottone che è sicurissimo.
-        
-        // --- METODO MIGLIORE (CLICK SUL BOTTONE) ---
-        // Cerchiamo il bottone "🕒" specifico di oggi.
-        // Il tuo HTML dice: onclick="apriModalTime('KEY')"
-        
-        const btnOrologio = document.querySelector(`button[onclick="apriModalTime('${oggiKey}')"]`);
-        
-        if (btnOrologio) {
-            btnOrologio.click(); // Clicchiamo il tasto originale
-            console.log("Click eseguito sul bottone orologio!");
-        } else {
-            console.warn("Bottone orologio non trovato! Provo a chiamare la funzione direttamente...");
-            // Piano B: chiamata diretta (funziona solo se la funzione è globale)
-            if (typeof apriModalTime === 'function') apriModalTime(oggiKey);
-            else if (window.apriModalTime) window.apriModalTime(oggiKey);
-        }
-
-    }, 500);
-}
-
-    
-
-    // Funzione Logout (da collegare a un bottone nel tuo HTML)
-    window.logoutApp = function() {
-        signOut(auth).then(() => {
-            location.reload(); // Ricarica la pagina per pulire tutto
-        });
+        setTimeout(() => {
+            const today = new Date();
+            const y = today.getFullYear();
+            const m = String(today.getMonth() + 1).padStart(2, '0');
+            const d = String(today.getDate()).padStart(2, '0');
+            const oggiKey = `${y}-${m}-${d}`;
+            const btnOrologio = document.querySelector(`button[onclick="apriModalTime('${oggiKey}')"]`);
+            if (btnOrologio) btnOrologio.click(); 
+        }, 500);
     }
 
-    // NUOVO WINDOW.ONLOAD
     window.onload = function() {
         const emailIn = document.getElementById('emailInput');
         const passIn = document.getElementById('passInput');
         const msg = document.getElementById('loginMsg');
 
-        // Click Accedi
         document.getElementById('btnLogin').addEventListener('click', () => {
             msg.innerText = "Accesso in corso...";
-            signInWithEmailAndPassword(auth, emailIn.value, passIn.value)
-                .catch((error) => {
-                    msg.innerText = "Errore: " + error.message;
-                });
+            signInWithEmailAndPassword(auth, emailIn.value, passIn.value).catch((error) => { msg.innerText = "Errore: " + error.message; });
         });
 
-        // Click Registrati
         document.getElementById('btnRegister').addEventListener('click', () => {
             msg.innerText = "Creazione account...";
             createUserWithEmailAndPassword(auth, emailIn.value, passIn.value)
-                .then(() => {
-                    msg.innerText = "Account creato! Accesso...";
-                    // Firebase fa il login automatico dopo la registrazione,
-                    // quindi onAuthStateChanged scatterà da solo.
-                })
-                .catch((error) => {
-                    msg.innerText = "Errore Reg: " + error.message;
-                });
+                .then(() => { msg.innerText = "Account creato! Accesso..."; })
+                .catch((error) => { msg.innerText = "Errore Reg: " + error.message; });
         });
 
-        // ASCOLTATORE FONDAMENTALE
-        // Appena Firebase capisce se sei loggato o no, scatta questa funzione
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // Se c'è l'utente, avviamo tutto
                 avviaApplicazione(user);
             } else {
-                // Se non c'è, ci assicuriamo che il login sia visibile
                 document.getElementById('loginContainer').style.display = 'flex';
                 document.getElementById('loadingOverlay').style.display = 'none';
             }
         });
     };
 
-
-        async function syncAllData() {
-    // 1. Sicurezza: Se non c'è l'utente, ci fermiamo
-    if (!currentUser) {
-        console.error("Nessun utente loggato, impossibile sincronizzare.");
-        return;
+    function logoutApp() {
+        signOut(auth).then(() => { location.reload(); });
     }
 
-    try {
-        console.log("Inizio Sync per utente:", currentUser.uid);
+    // --- FUNZIONI CLOUD ---
+    async function syncAllData() {
+        if (!currentUser) return;
+        try {
+            const docRef = doc(db, "users", currentUser.uid, "config", "generale");
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) { globalConfig = docSnap.data(); } 
+            else { await setDoc(docRef, defaultConfig); globalConfig = defaultConfig; }
 
-        // --- A. CONFIGURAZIONE ---
-        // Prima: doc(db, "config", "generale")
-        // Ora: users -> UID -> config -> generale
-        const docRef = doc(db, "users", currentUser.uid, "config", "generale");
-        const docSnap = await getDoc(docRef);
-        
-        if (docSnap.exists()) { 
-            globalConfig = docSnap.data(); 
+            const busteColRef = collection(db, "users", currentUser.uid, "buste_paga");
+            const qBuste = query(busteColRef);
+            const querySnapshotB = await getDocs(qBuste);
+            globalBuste = {}; 
+            querySnapshotB.forEach((doc) => { globalBuste[doc.id] = doc.data(); });
+
+            const regColRef = collection(db, "users", currentUser.uid, "registro_ore");
+            const qReg = query(regColRef);
+            const querySnapshotR = await getDocs(qReg);
+            globalDB = {}; 
+            querySnapshotR.forEach((doc) => { globalDB[doc.id] = doc.data(); });
+        } catch(e) { 
+            console.error("Sync Error", e); 
+            alert("Errore durante il caricamento dati: " + e.message);
+        }
+    }
+
+    async function saveDBEntry(key, data) {
+        if (!currentUser) return; 
+        globalDB[key] = data; 
+        await setDoc(doc(db, "users", currentUser.uid, "registro_ore", key), data); 
+    }
+
+    async function deleteDBEntry(key) {
+        if (!currentUser) return; 
+        delete globalDB[key]; 
+        await deleteDoc(doc(db, "users", currentUser.uid, "registro_ore", key)); 
+    }
+
+    async function saveBustaEntry(key, data) {
+        if (!currentUser) return; 
+        globalBuste[key] = data; 
+        await setDoc(doc(db, "users", currentUser.uid, "buste_paga", key), data); 
+    }
+
+    async function saveConfigData(newCfg) {
+        if (!currentUser) return; 
+        globalConfig = newCfg; 
+        await setDoc(doc(db, "users", currentUser.uid, "config", "generale"), newCfg); 
+    }
+
+    // --- FUNZIONI UTILS UI E LOGICA ---
+    function formatMoney(amount) { let n = parseFloat(amount); if(isNaN(n)) return "€ 0,00"; let parts = n.toFixed(2).split('.'); parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, "."); return "€ " + parts.join(','); }
+
+    function getAnniDisponibili() {
+        const anniSet = new Set(); const annoCorrente = new Date().getFullYear();
+        for (let i = annoCorrente - 2; i <= annoCorrente + 2; i++) { anniSet.add(i); }
+        Object.keys(globalDB).forEach(key => { const y = parseInt(key.split('-')[0]); if (!isNaN(y)) anniSet.add(y); });
+        Object.keys(globalBuste).forEach(key => { let parts = key.split('_'); if(parts.length >= 2) { let y = parseInt(parts[0]); if(!isNaN(y)) anniSet.add(y); } });
+        return Array.from(anniSet).sort((a, b) => a - b);
+    }
+
+    function popolaAnniTutti() { const anni = getAnniDisponibili(); riempiSelect(document.getElementById('annoSelect'), anni, currentYear); riempiSelect(document.getElementById('statsAnno'), anni, currentYear); }
+    
+    function riempiSelect(selectObj, anni, selectedVal) { 
+        selectObj.innerHTML = ''; 
+        anni.forEach(anno => { 
+            let opt = document.createElement('option'); 
+            opt.value = anno; 
+            opt.innerText = anno; 
+            if(anno == selectedVal) opt.selected = true; 
+            selectObj.appendChild(opt); 
+        }); 
+        let optNew = document.createElement('option'); 
+        optNew.value = "NEW"; 
+        optNew.innerText = "➕ Aggiungi Anno..."; 
+        optNew.style.fontWeight = "bold"; 
+        optNew.style.color = "#007bff"; 
+        selectObj.appendChild(optNew); 
+    }
+    
+    function gestisciAnnoMain(elem) { gestisciAnnoGenerico(elem, () => { currentYear = parseInt(elem.value); refreshTredicesimaStatus(); generaBottoniMesi(); }); }
+    function gestisciAnnoStats(elem) { gestisciAnnoGenerico(elem, () => { calcolaStats(); }); }
+    
+    function gestisciAnnoGenerico(elem, callback) { 
+        if (elem.value === "NEW") { 
+            let nuovoAnno = prompt("Inserisci Anno:"); 
+            let annoNum = parseInt(nuovoAnno); 
+            if (!isNaN(annoNum)) { 
+                riempiSelect(document.getElementById('annoSelect'), getAnniDisponibili().concat([annoNum]).sort(), annoNum); 
+                if(callback) callback(); 
+            } 
         } else { 
-            // Se è il primo accesso assoluto, crea la config di default NELLA SUA cartella
-            await setDoc(docRef, defaultConfig); 
-            globalConfig = defaultConfig;
-        }
-
-        // --- B. BUSTE PAGA ---
-        // Prima: collection(db, "buste_paga")
-        // Ora: users -> UID -> buste_paga
-        const busteColRef = collection(db, "users", currentUser.uid, "buste_paga");
-        const qBuste = query(busteColRef);
-        const querySnapshotB = await getDocs(qBuste);
-        
-        globalBuste = {}; 
-        querySnapshotB.forEach((doc) => { globalBuste[doc.id] = doc.data(); });
-
-        // --- C. REGISTRO ORE ---
-        // Prima: collection(db, "registro_ore")
-        // Ora: users -> UID -> registro_ore
-        const regColRef = collection(db, "users", currentUser.uid, "registro_ore");
-        const qReg = query(regColRef);
-        const querySnapshotR = await getDocs(qReg);
-        
-        globalDB = {}; 
-        querySnapshotR.forEach((doc) => { globalDB[doc.id] = doc.data(); });
-
-    } catch(e) { 
-        console.error("Sync Error", e); 
-        alert("Errore durante il caricamento dati: " + e.message);
+            if(callback) callback(); 
+        } 
     }
-}
-
-
-
-function calcolaPermessiVisivi(v) { 
-    let o = parseFloat(v) || 0; 
-    if (o > 0) {
-        let h = Math.floor(o);
-        let m = Math.round((o - h) * 60);
-        document.getElementById('out_permessi').innerText = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`; 
-    } else {
-        document.getElementById('out_permessi').innerText = "-";
-    }
-}
-
-function calcolaFerieVisive(v) { 
-    let o = parseFloat(v) || 0; 
-    document.getElementById('out_ferie').innerText = o > 0 ? `${o} gg` : "-"; 
-}
-
-function apriBusta() { 
-    document.getElementById('schedaMese').style.display = 'none'; 
-    document.getElementById('bustaPanel').style.display = 'block'; 
-    document.getElementById('bustaMeseTitle').innerText = `(${nomiMesi[currentMonth]})`; 
-    document.getElementById('bustaFeriePermessi').style.display = 'block'; 
     
-    const d = globalBuste[`${currentYear}_${currentMonth}`] || {}; 
-    document.getElementById('inp_stipendio').value = d.stipendio || ''; 
-    document.getElementById('inp_ferie_residue').value = d.ferie || ''; 
-    document.getElementById('inp_permessi_residue').value = d.permessi || ''; 
-    
-    calcolaFerieVisive(d.ferie); 
-    calcolaPermessiVisivi(d.permessi); 
-}
+    function toggleMainTitle(show) { document.getElementById('mainTitle').style.display = show ? 'block' : 'none'; }
 
-
-
-        function getConfig() { return globalConfig; }
-// --- FUNZIONI SALVATAGGIO CLOUD (UTENTE SPECIFICO) ---
-
-async function saveDBEntry(key, data) {
-    if (!currentUser) return; // Protezione
-    globalDB[key] = data; 
-    // Percorso: users -> UID -> registro_ore -> data (es. 2024-01-26)
-    await setDoc(doc(db, "users", currentUser.uid, "registro_ore", key), data); 
-}
-
-async function deleteDBEntry(key) {
-    if (!currentUser) return; // Protezione
-    delete globalDB[key]; 
-    // Percorso: users -> UID -> registro_ore -> data
-    await deleteDoc(doc(db, "users", currentUser.uid, "registro_ore", key)); 
-}
-
-async function saveBustaEntry(key, data) {
-    if (!currentUser) return; // Protezione
-    globalBuste[key] = data; 
-    // Percorso: users -> UID -> buste_paga -> MeseAnno
-    await setDoc(doc(db, "users", currentUser.uid, "buste_paga", key), data); 
-}
-
-async function saveConfigData(newCfg) {
-    if (!currentUser) return; // Protezione
-    globalConfig = newCfg; 
-    // Percorso: users -> UID -> config -> generale
-    await setDoc(doc(db, "users", currentUser.uid, "config", "generale"), newCfg); 
-}
-
-
-        function formatMoney(amount) { let n = parseFloat(amount); if(isNaN(n)) return "€ 0,00"; let parts = n.toFixed(2).split('.'); parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, "."); return "€ " + parts.join(','); }
-
-        function getAnniDisponibili() {
-            const anniSet = new Set(); const annoCorrente = new Date().getFullYear();
-            for (let i = annoCorrente - 2; i <= annoCorrente + 2; i++) { anniSet.add(i); }
-            Object.keys(globalDB).forEach(key => { const y = parseInt(key.split('-')[0]); if (!isNaN(y)) anniSet.add(y); });
-            Object.keys(globalBuste).forEach(key => { let parts = key.split('_'); if(parts.length >= 2) { let y = parseInt(parts[0]); if(!isNaN(y)) anniSet.add(y); } });
-            return Array.from(anniSet).sort((a, b) => a - b);
+    function calcolaPermessiVisivi(v) { 
+        let o = parseFloat(v) || 0; 
+        if (o > 0) {
+            let h = Math.floor(o);
+            let m = Math.round((o - h) * 60);
+            document.getElementById('out_permessi').innerText = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`; 
+        } else {
+            document.getElementById('out_permessi').innerText = "-";
         }
+    }
 
-        function popolaAnniTutti() { const anni = getAnniDisponibili(); riempiSelect(document.getElementById('annoSelect'), anni, currentYear); riempiSelect(document.getElementById('statsAnno'), anni, currentYear); }
-        function riempiSelect(selectObj, anni, selectedVal) { selectObj.innerHTML = ''; anni.forEach(anno => { let opt = document.createElement('option'); opt.value = anno; opt.innerText = anno; if(anno == selectedVal) opt.selected = true; selectObj.appendChild(opt); }); let optNew = document.createElement('option'); optNew.value = "NEW"; optNew.innerText = "➕ Aggiungi Anno..."; optNew.style.fontWeight = "bold"; optNew.style.color = "#007bff"; selectObj.appendChild(optNew); }
-        function gestisciAnnoMain(elem) { gestisciAnnoGenerico(elem, () => { currentYear = parseInt(elem.value); refreshTredicesimaStatus(); generaBottoniMesi(); }); }
-        function gestisciAnnoStats(elem) { gestisciAnnoGenerico(elem, () => { calcolaStats(); }); }
-        function gestisciAnnoGenerico(elem, callback) { if (elem.value === "NEW") { let nuovoAnno = prompt("Inserisci Anno:"); let annoNum = parseInt(nuovoAnno); if (!isNaN(annoNum)) { riempiSelect(document.getElementById('annoSelect'), getAnniDisponibili().concat([annoNum]).sort(), annoNum); if(callback) callback(); } } else { if(callback) callback(); } }
-        function toggleMainTitle(show) { document.getElementById('mainTitle').style.display = show ? 'block' : 'none'; }
+    function calcolaFerieVisive(v) { 
+        let o = parseFloat(v) || 0; 
+        document.getElementById('out_ferie').innerText = o > 0 ? `${o} gg` : "-"; 
+    }
 
-        function mostraRiepilogoStipendi() {
-            const container = document.getElementById('containerStipendiList'); container.innerHTML = '';
-            const datiPerAnno = {}; const anni = getAnniDisponibili();
-            anni.forEach(anno => {
-                let totaleAnno = 0; let mesiTrovati = [];
-                for(let m=0; m<=12; m++) { 
-                    const key = `${anno}_${m}`; const d = globalBuste[key];
-                    if(d && d.stipendio && parseFloat(d.stipendio) > 0) {
-                        totaleAnno += parseFloat(d.stipendio);
-                        let nome = (m===12) ? "13ª Mensilità" : nomiMesi[m];
-                        mesiTrovati.push({ idx: m, mese: nome, val: parseFloat(d.stipendio) });
-                    }
-                }
-                if(mesiTrovati.length > 0) { mesiTrovati.sort((a,b) => b.idx - a.idx); datiPerAnno[anno] = { tot: totaleAnno, dettagli: mesiTrovati }; }
+    function mostraRiepilogoStipendi() {
+        const container = document.getElementById('containerStipendiList'); 
+        container.innerHTML = '';
+        
+        const annoSelezionato = document.getElementById('statsAnno').value;
+        
+        // Aggiorniamo il titolo del modale per mostrare di che anno si tratta
+        const titoloModale = document.querySelector('#riepilogoStipendiModal .modal-title');
+        if (titoloModale) {
+            titoloModale.innerHTML = `Riepilogo Stipendi - ${annoSelezionato}`;
+        }
+        
+        let totaleAnno = 0; 
+        let mesiTrovati = [];
+        
+        for(let m=0; m<=12; m++) { 
+            const key = `${annoSelezionato}_${m}`; 
+            const d = globalBuste[key];
+            if(d && d.stipendio && parseFloat(d.stipendio) > 0) {
+                totaleAnno += parseFloat(d.stipendio);
+                let nome = (m===12) ? "13ª Mensilità" : nomiMesi[m];
+                mesiTrovati.push({ idx: m, mese: nome, val: parseFloat(d.stipendio) });
+            }
+        }
+        
+        if(mesiTrovati.length === 0) {
+            container.innerHTML = `<div style="text-align:center; padding:20px; color:#999;">Nessuno stipendio inserito per il ${annoSelezionato}.</div>`;
+        } else {
+            mesiTrovati.sort((a,b) => b.idx - a.idx);
+            let html = `<div class="anno-box"><div class="anno-header"><span>Totale Annuale</span><span>${formatMoney(totaleAnno)}</span></div><div>`;
+            mesiTrovati.forEach(item => { 
+                html += `<div class="mese-row-stipendio"><span>${item.mese}</span><span class="val-stipendio">${formatMoney(item.val)}</span></div>`; 
             });
-            if(Object.keys(datiPerAnno).length === 0) container.innerHTML = '<div style="text-align:center; padding:20px; color:#999;">Nessuno stipendio.</div>';
-            else {
-                Object.keys(datiPerAnno).sort((a,b) => b-a).forEach(anno => {
-                    const data = datiPerAnno[anno];
-                    let html = `<div class="anno-box"><div class="anno-header"><span>${anno}</span><span>Tot: ${formatMoney(data.tot)}</span></div><div>`;
-                    data.dettagli.forEach(item => { html += `<div class="mese-row-stipendio"><span>${item.mese}</span><span class="val-stipendio">${formatMoney(item.val)}</span></div>`; });
-                    html += `</div></div>`; container.innerHTML += html;
-                });
-            }
-            document.getElementById('riepilogoStipendiModal').style.display = 'flex';
-        }
-        function chiudiRiepilogoStipendi() { document.getElementById('riepilogoStipendiModal').style.display = 'none'; }
-
-        function apriModalTime(chiave) {
-            document.getElementById('current_edit_key').value = chiave;
-            const entry = globalDB[chiave] || {};
-            document.getElementById('t_in1').value = ""; document.getElementById('t_out1').value = "";
-            document.getElementById('t_in2').value = ""; document.getElementById('t_out2').value = "";
-            if (entry.orari) {
-                document.getElementById('t_in1').value = entry.orari.in1 || ""; document.getElementById('t_out1').value = entry.orari.out1 || "";
-                document.getElementById('t_in2').value = entry.orari.in2 || ""; document.getElementById('t_out2').value = entry.orari.out2 || "";
-            }
-            let targetHHMM = "00:00";
-            if(entry.previste) targetHHMM = entry.previste;
-            else {
-                const [y, m, d] = chiave.split('-'); const dayIdx = new Date(y, m-1, d).getDay();
-                targetHHMM = globalConfig[dayIdx] || "00:00";
-            }
-            document.getElementById('current_target_minutes').value = hhmmToMin(targetHHMM);
-            updateSummary(); document.getElementById('timbraturaModal').style.display = 'flex';
-        }
-        function setNow(id) { 
-            const now = new Date(); document.getElementById(id).value = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`; 
-            updateSummary(); 
-        }
-        function updateSummary() {
-            const in1 = document.getElementById('t_in1').value; const out1 = document.getElementById('t_out1').value;
-            const in2 = document.getElementById('t_in2').value; const out2 = document.getElementById('t_out2').value;
-            const minMattina = diffMinuti(in1, out1); const minPomeriggio = diffMinuti(in2, out2); const minPranzo = diffMinuti(out1, in2);
-            const pausaObb = hhmmToMin(globalConfig.pausa || "00:00");
-            let penalty = 0; if(out1 && in2 && pausaObb > 0 && minPranzo < pausaObb) penalty = pausaObb - minPranzo;
-            
-            document.getElementById('sum_mattina').innerText = minToHHMM(minMattina);
-            document.getElementById('sum_pomeriggio').innerText = minToHHMM(minPomeriggio);
-            document.getElementById('sum_pranzo').innerText = minToHHMM(minPranzo);
-            
-            const rPen = document.getElementById('row_penalty');
-            if(penalty>0) { rPen.style.display='flex'; document.getElementById('sum_penalty').innerText = `-${penalty} min`; } else rPen.style.display='none';
-            document.getElementById('sum_totale_def').innerText = minToHHMM(Math.max(0, minMattina+minPomeriggio-penalty));
-
-            const box = document.getElementById('suggestionBox'); const target = parseInt(document.getElementById('current_target_minutes').value)||0;
-            if(target>0 && in1 && out1) {
-                box.style.display='block';
-                if(!in2) { document.getElementById('suggestionTime').innerText = "Inserisci Rientro..."; document.getElementById('suggestionTime').style.fontSize='1rem'; }
-                else {
-                    document.getElementById('suggestionTime').style.fontSize='1.4rem';
-                    const mancanti = target - minMattina + penalty;
-                    if(mancanti>0) document.getElementById('suggestionTime').innerText = minToHHMM(hhmmToMin(in2)+mancanti);
-                    else document.getElementById('suggestionTime').innerText = "Target Raggiunto!";
-                }
-            } else box.style.display='none';
-        }
-        function diffMinuti(s,e) { if(!s||!e) return 0; const [h1,m1]=s.split(':'), [h2,m2]=e.split(':'); const tot1=h1*60+ +m1, tot2=h2*60+ +m2; return tot2<tot1 ? 0 : tot2-tot1; }
-        function hhmmToMin(s) { if(!s) return 0; const [h,m]=s.split(':'); return h*60+ +m; }
-        function minToHHMM(m) { if(m<=0) return "00:00"; const hh=Math.floor(m/60), mm=m%60; return `${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}`; }
-        function chiudiModalTime() { document.getElementById('timbraturaModal').style.display = 'none'; }
-        
-        async function salvaTimbratura() {
-            const key = document.getElementById('current_edit_key').value;
-            const in1 = document.getElementById('t_in1').value; const out1 = document.getElementById('t_out1').value;
-            const in2 = document.getElementById('t_in2').value; const out2 = document.getElementById('t_out2').value;
-            const minM = diffMinuti(in1, out1); const minP = diffMinuti(in2, out2); const minPr = diffMinuti(out1, in2);
-            const pObb = hhmmToMin(globalConfig.pausa || "00:00");
-            let pen = 0; if(out1 && in2 && pObb > 0 && minPr < pObb) pen = pObb - minPr;
-            const totNetto = Math.max(0, minM + minP - pen);
-            
-            const prev = document.getElementById('prev_'+key) ? document.getElementById('prev_'+key).innerText : "00:00";
-            
-            let entry = globalDB[key] || {};
-            entry.orari = { in1, out1, in2, out2 };
-            entry.previste = prev;
-            if(totNetto > 0 || in1) { entry.fatte = minToHHMM(totNetto); } else { entry.fatte = ""; }
-            await saveDBEntry(key, entry);
-			
-			    const inputEl = document.getElementById('input_fatte_'+key);
-    if(inputEl) inputEl.value = entry.fatte;
-			    aggiornaColoreInput(key, entry.fatte); // <--- Passa il valore esplicito!
-				
-
-            chiudiModalTime(); calcolaTotali();
-        }
-
-function aggiornaColoreInput(key, valoreForzato = null) {
-    const inputEl = document.getElementById(`input_fatte_${key}`);
-    const prevEl = document.getElementById(`prev_${key}`);
-    
-    if(!inputEl || !prevEl) return;
-
-    // Se mi passi il valore (es. dalla modale), uso quello. 
-    // Altrimenti leggo quello che c'è scritto nell'input ora.
-    const oreFatte = (valoreForzato !== null) ? valoreForzato : inputEl.value; 
-    const orePrev = prevEl.innerText;
-    
-    const toMin = (s) => { if(!s) return 0; const [h,m]=s.split(':'); return parseInt(h)*60 + parseInt(m); };
-
-    if(oreFatte) {
-        const minFatte = toMin(oreFatte);
-        const minPrev = toMin(orePrev);
-        
-        // Applichiamo stile
-        let color = "";
-        let weight = "";
-        
-        if(minPrev > 0) {
-            if(minFatte >= minPrev) { color = "#28a745"; weight = "bold"; } // Verde
-            else { color = "#dc3545"; weight = "bold"; } // Rosso
-        } else if(minFatte > 0) {
-            color = "#007bff"; weight = "bold"; // Blu
+            html += `</div></div>`; 
+            container.innerHTML = html;
         }
         
-        inputEl.style.color = color;
-        inputEl.style.fontWeight = weight;
-        
-    } else {
-        inputEl.style.color = ""; 
-        inputEl.style.fontWeight = "";
+        document.getElementById('riepilogoStipendiModal').style.display = 'flex';
     }
-}
+    
+    function chiudiRiepilogoStipendi() { document.getElementById('riepilogoStipendiModal').style.display = 'none'; }
 
+    function apriModalTime(chiave) {
+        document.getElementById('current_edit_key').value = chiave;
+        const entry = globalDB[chiave] || {};
+        document.getElementById('t_in1').value = ""; document.getElementById('t_out1').value = "";
+        document.getElementById('t_in2').value = ""; document.getElementById('t_out2').value = "";
+        if (entry.orari) {
+            document.getElementById('t_in1').value = entry.orari.in1 || ""; document.getElementById('t_out1').value = entry.orari.out1 || "";
+            document.getElementById('t_in2').value = entry.orari.in2 || ""; document.getElementById('t_out2').value = entry.orari.out2 || "";
+        }
+        let targetHHMM = "00:00";
+        if(entry.previste) targetHHMM = entry.previste;
+        else {
+            const [y, m, d] = chiave.split('-'); const dayIdx = new Date(y, m-1, d).getDay();
+            targetHHMM = globalConfig[dayIdx] || "00:00";
+        }
+        document.getElementById('current_target_minutes').value = hhmmToMin(targetHHMM);
+        updateSummary(); document.getElementById('timbraturaModal').style.display = 'flex';
+    }
+    
+    function setNow(id) { 
+        const now = new Date(); document.getElementById(id).value = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`; 
+        updateSummary(); 
+    }
+    
+    function updateSummary() {
+        const in1 = document.getElementById('t_in1').value; const out1 = document.getElementById('t_out1').value;
+        const in2 = document.getElementById('t_in2').value; const out2 = document.getElementById('t_out2').value;
+        const minMattina = diffMinuti(in1, out1); const minPomeriggio = diffMinuti(in2, out2); const minPranzo = diffMinuti(out1, in2);
+        const pausaObb = hhmmToMin(globalConfig.pausa || "00:00");
+        let penalty = 0; if(out1 && in2 && pausaObb > 0 && minPranzo < pausaObb) penalty = pausaObb - minPranzo;
+        
+        document.getElementById('sum_mattina').innerText = minToHHMM(minMattina);
+        document.getElementById('sum_pomeriggio').innerText = minToHHMM(minPomeriggio);
+        document.getElementById('sum_pranzo').innerText = minToHHMM(minPranzo);
+        
+        const rPen = document.getElementById('row_penalty');
+        if(penalty>0) { rPen.style.display='flex'; document.getElementById('sum_penalty').innerText = `-${penalty} min`; } else rPen.style.display='none';
+        document.getElementById('sum_totale_def').innerText = minToHHMM(Math.max(0, minMattina+minPomeriggio-penalty));
 
-
-        async function salvaTutto(key) {
-            let valFatte = document.getElementById(`input_fatte_${key}`).value;
-            let valTipo = document.getElementById(`sel_tipo_${key}`).value;
-            let valQty = document.getElementById(`inp_qty_${key}`).value;
-            let prev = document.getElementById('prev_'+key) ? document.getElementById('prev_'+key).innerText : "00:00";
-            let btn = document.getElementById(`btn_extra_${key}`);
-            if(valTipo) { btn.classList.add('active'); btn.innerHTML = valTipo.substring(0,3).toUpperCase() + "<br>" + (valQty||'?') + (valTipo==='Permesso'?'h':'g'); } 
-            else { btn.classList.remove('active'); btn.innerHTML = "+"; }
-
-            let entry = globalDB[key] || {};
-            entry.fatte = valFatte; entry.previste = prev; entry.assenzaTipo = valTipo; entry.assenzaQty = valQty;
-            if(!valFatte && !valTipo && !entry.orari?.in1) { await deleteDBEntry(key); }
-            else { await saveDBEntry(key, entry); }
-			
-			aggiornaColoreInput(key, valFatte);
-            calcolaTotali();
-			
-			    // Dopo aver salvato, ricalcolo le settimane del mese corrente
-			ricalcolaTotSettimane();
-			
+        const box = document.getElementById('suggestionBox'); const target = parseInt(document.getElementById('current_target_minutes').value)||0;
+        if(target>0 && in1 && out1) {
+            box.style.display='block';
+            if(!in2) { document.getElementById('suggestionTime').innerText = "Inserisci Rientro..."; document.getElementById('suggestionTime').style.fontSize='1rem'; }
+            else {
+                document.getElementById('suggestionTime').style.fontSize='1.4rem';
+                const mancanti = target - minMattina + penalty;
+                if(mancanti>0) document.getElementById('suggestionTime').innerText = minToHHMM(hhmmToMin(in2)+mancanti);
+                else document.getElementById('suggestionTime').innerText = "Target Raggiunto!";
             }
-			
-        function generGiorni(anno, mese) {
-    const container = document.getElementById('giorniContainer'); 
-    container.innerHTML = '';
+        } else box.style.display='none';
+    }
     
-    const giorniTot = new Date(anno, mese+1, 0).getDate();
-    const oggi = new Date(); 
-    oggi.setHours(0,0,0,0);
+    function diffMinuti(s,e) { if(!s||!e) return 0; const [h1,m1]=s.split(':'), [h2,m2]=e.split(':'); const tot1=h1*60+ +m1, tot2=h2*60+ +m2; return tot2<tot1 ? 0 : tot2-tot1; }
+    function hhmmToMin(s) { if(!s) return 0; const [h,m]=s.split(':'); return h*60+ +m; }
+    function minToHHMM(m) { if(m<=0) return "00:00"; const hh=Math.floor(m/60), mm=m%60; return `${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}`; }
+    function chiudiModalTime() { document.getElementById('timbraturaModal').style.display = 'none'; }
     
-    for(let i=1; i<=giorniTot; i++) {
-        let key = `${anno}-${String(mese+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
-        let dateObj = new Date(anno, mese, i);
-        let dayOfWeek = dateObj.getDay();
+    async function salvaTimbratura() {
+        const key = document.getElementById('current_edit_key').value;
+        const in1 = document.getElementById('t_in1').value; const out1 = document.getElementById('t_out1').value;
+        const in2 = document.getElementById('t_in2').value; const out2 = document.getElementById('t_out2').value;
+        const minM = diffMinuti(in1, out1); const minP = diffMinuti(in2, out2); const minPr = diffMinuti(out1, in2);
+        const pObb = hhmmToMin(globalConfig.pausa || "00:00");
+        let pen = 0; if(out1 && in2 && pObb > 0 && minPr < pObb) pen = pObb - minPr;
+        const totNetto = Math.max(0, minM + minP - pen);
+        
+        const prev = document.getElementById('prev_'+key) ? document.getElementById('prev_'+key).innerText : "00:00";
         
         let entry = globalDB[key] || {};
+        entry.orari = { in1, out1, in2, out2 };
+        entry.previste = prev;
+        if(totNetto > 0 || in1) { entry.fatte = minToHHMM(totNetto); } else { entry.fatte = ""; }
+        await saveDBEntry(key, entry);
         
-        // Ore Previste e Fatte
-        let prevHHMM = entry.previste || globalConfig[dayOfWeek] || "00:00";
-        let fatteHHMM = entry.fatte || "";
+        const inputEl = document.getElementById('input_fatte_'+key);
+        if(inputEl) inputEl.value = entry.fatte;
+        aggiornaColoreInput(key, entry.fatte); 
+        chiudiModalTime(); calcolaTotali();
+    }
+
+    function aggiornaColoreInput(key, valoreForzato = null) {
+        const inputEl = document.getElementById(`input_fatte_${key}`);
+        const prevEl = document.getElementById(`prev_${key}`);
         
-        // CALCOLO COLORE (Logica Semaforo)
-        let styleColor = "";
-        if(fatteHHMM) {
-            const minPrev = hhmmToMin(prevHHMM);
-            const minFatte = hhmmToMin(fatteHHMM);
-            
+        if(!inputEl || !prevEl) return;
+        const oreFatte = (valoreForzato !== null) ? valoreForzato : inputEl.value; 
+        const orePrev = prevEl.innerText;
+        const toMin = (s) => { if(!s) return 0; const [h,m]=s.split(':'); return parseInt(h)*60 + parseInt(m); };
+
+        if(oreFatte) {
+            const minFatte = toMin(oreFatte);
+            const minPrev = toMin(orePrev);
+            let color = ""; let weight = "";
             if(minPrev > 0) {
-                if(minFatte >= minPrev) {
-                    styleColor = "color:#28a745; font-weight:bold;"; // VERDE
-                } else {
-                    styleColor = "color:#dc3545; font-weight:bold;"; // ROSSO
-                }
-            } else if (minFatte > 0) {
-                styleColor = "color:#007bff; font-weight:bold;"; // BLU
+                if(minFatte >= minPrev) { color = "#28a745"; weight = "bold"; } 
+                else { color = "#dc3545"; weight = "bold"; } 
+            } else if(minFatte > 0) {
+                color = "#007bff"; weight = "bold"; 
             }
+            inputEl.style.color = color;
+            inputEl.style.fontWeight = weight;
+        } else {
+            inputEl.style.color = ""; 
+            inputEl.style.fontWeight = "";
         }
-
-        let tipo = entry.assenzaTipo || ""; 
-        let qty = entry.assenzaQty || "";
-        let hasOrari = entry.orari && (entry.orari.in1 || entry.orari.in2);
-        
-        let cl = ['giorno-row']; 
-        if(dayOfWeek===0) cl.push('row-domenica'); 
-        else if(dayOfWeek===6) cl.push('row-sabato'); 
-        if(dateObj<oggi) cl.push('row-passato');
-        
-        let btnL = "+", btnC = "btn-extra"; 
-        if(tipo) { 
-            btnC+=" active"; 
-            btnL=`${tipo.substr(0,3).toUpperCase()}<br>${qty}${(tipo==='Permesso'?'h':'g')}`; 
-        }
-        
-        container.innerHTML += `
-        <div class="giorno-wrapper">
-            <div class="${cl.join(' ')}">
-                <span class="giorno-label">${i} ${dateObj.toLocaleDateString('it-IT',{weekday:'short'})}</span>
-                <div class="giorno-previsto" id="prev_${key}">${prevHHMM}</div>
-                
-                <div class="input-group-ore">
-                    <input type="text" class="giorno-input" id="input_fatte_${key}" 
-                           value="${fatteHHMM}" 
-                           style="${styleColor}"
-                           onchange="salvaTutto('${key}')" 
-                           placeholder="--:--" maxlength="5">
-                           
-                    <button class="btn-clock ${hasOrari?'has-time':''}" onclick="apriModalTime('${key}')">🕒</button>
-                </div>
-                
-                <button class="${btnC}" id="btn_extra_${key}" onclick="toggleAssenze('${key}')">${btnL}</button>
-            </div>
-            <div class="assenze-panel" id="panel_${key}">
-                <div class="assenze-row">
-                    <select class="assenze-select" id="sel_tipo_${key}" onchange="gestisciInputAssenza('${key}')">
-                        <option value="">Nessuna</option>
-                        <option value="Ferie" ${tipo==='Ferie'?'selected':''}>Ferie</option>
-                        <option value="Malattia" ${tipo==='Malattia'?'selected':''}>Malattia</option>
-                        <option value="Permesso" ${tipo==='Permesso'?'selected':''}>Permesso</option>
-                        <option value="Festivo" ${tipo==='Festivo'?'selected':''}>Festivo</option>
-                    </select>
-                    <input class="assenze-qty" id="inp_qty_${key}" value="${qty}" onkeyup="salvaTutto('${key}')" ${tipo==='Permesso'?'':'readonly'}>
-                </div>
-                <button onclick="confermaAssenza('${key}')" style="width:100%;padding:5px;">Chiudi</button>
-            </div>
-        </div>`;
     }
-    
-    // 🔑 UNA SOLA chiamata: genera TUTTI i TOT corretti
-    setTimeout(() => {
-        console.log('🚀 generGiorni → ricalcolaTotSettimane');
+
+    async function salvaTutto(key) {
+        let valFatte = document.getElementById(`input_fatte_${key}`).value;
+        let valTipo = document.getElementById(`sel_tipo_${key}`).value;
+        let valQty = document.getElementById(`inp_qty_${key}`).value;
+        let prev = document.getElementById('prev_'+key) ? document.getElementById('prev_'+key).innerText : "00:00";
+        let btn = document.getElementById(`btn_extra_${key}`);
+        if(valTipo) { btn.classList.add('active'); btn.innerHTML = valTipo.substring(0,3).toUpperCase() + "<br>" + (valQty||'?') + (valTipo==='Permesso'?'h':'g'); } 
+        else { btn.classList.remove('active'); btn.innerHTML = "+"; }
+
+        let entry = globalDB[key] || {};
+        entry.fatte = valFatte; entry.previste = prev; entry.assenzaTipo = valTipo; entry.assenzaQty = valQty;
+        if(!valFatte && !valTipo && !entry.orari?.in1) { await deleteDBEntry(key); }
+        else { await saveDBEntry(key, entry); }
+        
+        aggiornaColoreInput(key, valFatte);
+        calcolaTotali();
         ricalcolaTotSettimane();
-    }, 100);
-}
-
-
-function ricalcolaTotSettimane() {
-    const container = document.getElementById('giorniContainer');
-    if (!container) return;
-
-    container.querySelectorAll('.row-tot-settimana').forEach(r => r.remove());
-
-    const giornoNum = { 'lun':1, 'mar':2, 'mer':3, 'gio':4, 'ven':5, 'sab':6, 'dom':0 };
-    const giorni = Array.from(container.querySelectorAll('.giorno-wrapper:not(.row-tot-settimana)'));
-
-    giorni.forEach((wrapper) => {
-        const row = wrapper.querySelector('.giorno-row');
-        if (!row) return;
-
-        const labelText = row.querySelector('.giorno-label')?.textContent?.trim() || '';
-        const parts = labelText.split(' ');
-        const giornoMese = parseInt(parts[0]);
-        const giornoShort = parts[1]?.toLowerCase() || '';
-        const numGiorno = giornoNum[giornoShort];
-
-        // 🔑 SOLO se DOMENICA: calcola settimana COMPLETA da globalDB
-        if (numGiorno === 0) {
-            const dataDomenica = new Date(currentYear, currentMonth, giornoMese);
+    }
             
-            // Trova LUNEDÌ della settimana (ritorno indietro fino a lun)
-            const lunedi = new Date(dataDomenica);
-            const diffDays = dataDomenica.getDay() === 0 ? 6 : dataDomenica.getDay() - 1;
-            lunedi.setDate(dataDomenica.getDate() - diffDays);
-
-            console.log(`📅 DOMENICA ${giornoMese} → Settimana da ${lunedi.toLocaleDateString('it-IT')}`);
-
-            // Somma TUTTE ore lun-dom da globalDB
-            let totMin = 0;
-            let d = new Date(lunedi);
-            while (d <= dataDomenica) {
-                const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-                const entry = globalDB[key];
-                if (entry?.fatte) {
-                    const mins = hhmmToMin(entry.fatte);
-                    totMin += mins;
-                    console.log(`   📦 ${key}: ${entry.fatte} (+${mins}min) → totMin:${totMin}`);
+    function generGiorni(anno, mese) {
+        const container = document.getElementById('giorniContainer'); 
+        container.innerHTML = '';
+        
+        const giorniTot = new Date(anno, mese+1, 0).getDate();
+        const oggi = new Date(); 
+        oggi.setHours(0,0,0,0);
+        
+        for(let i=1; i<=giorniTot; i++) {
+            let key = `${anno}-${String(mese+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+            let dateObj = new Date(anno, mese, i);
+            let dayOfWeek = dateObj.getDay();
+            
+            let entry = globalDB[key] || {};
+            let prevHHMM = entry.previste || globalConfig[dayOfWeek] || "00:00";
+            let fatteHHMM = entry.fatte || "";
+            let styleColor = "";
+            if(fatteHHMM) {
+                const minPrev = hhmmToMin(prevHHMM);
+                const minFatte = hhmmToMin(fatteHHMM);
+                if(minPrev > 0) {
+                    if(minFatte >= minPrev) { styleColor = "color:#28a745; font-weight:bold;"; } 
+                    else { styleColor = "color:#dc3545; font-weight:bold;"; }
+                } else if (minFatte > 0) {
+                    styleColor = "color:#007bff; font-weight:bold;";
                 }
-                d.setDate(d.getDate() + 1);
             }
 
-            const hhmm = minToHHMM(totMin);
-            const totDiv = document.createElement('div');
-            totDiv.className = 'giorno-wrapper row-tot-settimana';
-            totDiv.innerHTML = `
-                <div class="giorno-row" style="background:#f1f3f5; border-top:1px solid #ccc; border-bottom:1px solid #ccc;">
-                    <span class="giorno-label" style="font-weight:bold;">TOT</span>
-                    <div class="giorno-previsto" style="font-size:0.8rem;">Sett. Completa</div>
+            let tipo = entry.assenzaTipo || ""; 
+            let qty = entry.assenzaQty || "";
+            let hasOrari = entry.orari && (entry.orari.in1 || entry.orari.in2);
+            let cl = ['giorno-row']; 
+            if(dayOfWeek===0) cl.push('row-domenica'); 
+            else if(dayOfWeek===6) cl.push('row-sabato'); 
+            if(dateObj<oggi) cl.push('row-passato');
+            
+            let btnL = "+", btnC = "btn-extra"; 
+            if(tipo) { 
+                btnC+=" active"; 
+                btnL=`${tipo.substr(0,3).toUpperCase()}<br>${qty}${(tipo==='Permesso'?'h':'g')}`; 
+            }
+            
+            container.innerHTML += `
+            <div class="giorno-wrapper">
+                <div class="${cl.join(' ')}">
+                    <span class="giorno-label">${i} ${dateObj.toLocaleDateString('it-IT',{weekday:'short'})}</span>
+                    <div class="giorno-previsto" id="prev_${key}">${prevHHMM}</div>
                     <div class="input-group-ore">
-                        <input class="giorno-input" value="${hhmm}" readonly style="font-weight:bold; color:#343a40; background:#e9ecef;">
-                        <button class="btn-clock" disabled style="opacity:0;">🕒</button>
+                        <input type="text" class="giorno-input" id="input_fatte_${key}" value="${fatteHHMM}" style="${styleColor}" onchange="salvaTutto('${key}')" placeholder="--:--" maxlength="5">
+                        <button class="btn-clock ${hasOrari?'has-time':''}" onclick="apriModalTime('${key}')">🕒</button>
                     </div>
-                    <button class="btn-extra" disabled style="visibility:hidden;">+</button>
+                    <button class="${btnC}" id="btn_extra_${key}" onclick="toggleAssenze('${key}')">${btnL}</button>
                 </div>
-            `;
-            wrapper.after(totDiv);
-            console.log(`✅ ✅ TOT SETTIMANA: ${hhmm}\n`);
+                <div class="assenze-panel" id="panel_${key}">
+                    <div class="assenze-row">
+                        <select class="assenze-select" id="sel_tipo_${key}" onchange="gestisciInputAssenza('${key}')">
+                            <option value="">Nessuna</option>
+                            <option value="Ferie" ${tipo==='Ferie'?'selected':''}>Ferie</option>
+                            <option value="Malattia" ${tipo==='Malattia'?'selected':''}>Malattia</option>
+                            <option value="Permesso" ${tipo==='Permesso'?'selected':''}>Permesso</option>
+                            <option value="Festivo" ${tipo==='Festivo'?'selected':''}>Festivo</option>
+                        </select>
+                        <input class="assenze-qty" id="inp_qty_${key}" value="${qty}" onkeyup="salvaTutto('${key}')" ${tipo==='Permesso'?'':'readonly'}>
+                    </div>
+                    <button onclick="confermaAssenza('${key}')" style="width:100%;padding:5px;">Chiudi</button>
+                </div>
+            </div>`;
         }
-    });
-}
-
-
-
-
-
-
-
-// Helper per creare riga TOT (DRY)
-function creaTotDiv(posizione, hhmm, label) {
-    const totDiv = document.createElement('div');
-    totDiv.className = 'giorno-wrapper row-tot-settimana';
-    totDiv.innerHTML = `
-        <div class="giorno-row" style="background:#f1f3f5; border-top:1px solid #ccc; border-bottom:1px solid #ccc;">
-            <span class="giorno-label" style="font-weight:bold;">TOT</span>
-            <div class="giorno-previsto" style="font-size:0.8rem;">${label}</div>
-            <div class="input-group-ore">
-                <input class="giorno-input" value="${hhmm}" readonly style="font-weight:bold; color:#343a40; background:#e9ecef;">
-                <button class="btn-clock" disabled style="opacity:0;">🕒</button>
-            </div>
-            <button class="btn-extra" disabled style="visibility:hidden;">+</button>
-        </div>
-    `;
-    if (posizione.after) {
-        posizione.after(totDiv);
-    } else {
-        posizione.appendChild(totDiv);
+        
+        setTimeout(() => { ricalcolaTotSettimane(); }, 100);
     }
-}
 
+    function ricalcolaTotSettimane() {
+        const container = document.getElementById('giorniContainer');
+        if (!container) return;
+        container.querySelectorAll('.row-tot-settimana').forEach(r => r.remove());
 
+        const giornoNum = { 'lun':1, 'mar':2, 'mer':3, 'gio':4, 'ven':5, 'sab':6, 'dom':0 };
+        const giorni = Array.from(container.querySelectorAll('.giorno-wrapper:not(.row-tot-settimana)'));
 
+        giorni.forEach((wrapper) => {
+            const row = wrapper.querySelector('.giorno-row');
+            if (!row) return;
 
+            const labelText = row.querySelector('.giorno-label')?.textContent?.trim() || '';
+            const parts = labelText.split(' ');
+            const giornoMese = parseInt(parts[0]);
+            const giornoShort = parts[1]?.toLowerCase() || '';
+            const numGiorno = giornoNum[giornoShort];
 
-        function toggleAssenze(k) { const p=document.getElementById('panel_'+k); p.style.display=p.style.display==='block'?'none':'block'; }
-        function gestisciInputAssenza(k) { 
-            const t=document.getElementById('sel_tipo_'+k).value, q=document.getElementById('inp_qty_'+k);
-            if(t==='Permesso') { q.readOnly=false; if(q.value==1) q.value=''; } else { q.readOnly=true; if(t) q.value=1; else q.value=''; }
-            salvaTutto(k);
-        }
-        function confermaAssenza(k) { salvaTutto(k); document.getElementById('panel_'+k).style.display='none'; }
-        
-        function calcolaTotali() {
-    let tm = 0, tp = 0, tf = 0, tmal = 0; 
-    const days = new Date(currentYear, currentMonth + 1, 0).getDate();
+            if (numGiorno === 0) {
+                const dataDomenica = new Date(currentYear, currentMonth, giornoMese);
+                const lunedi = new Date(dataDomenica);
+                const diffDays = dataDomenica.getDay() === 0 ? 6 : dataDomenica.getDay() - 1;
+                lunedi.setDate(dataDomenica.getDate() - diffDays);
+
+                let totMin = 0;
+                let d = new Date(lunedi);
+                while (d <= dataDomenica) {
+                    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+                    const entry = globalDB[key];
+                    if (entry?.fatte) { totMin += hhmmToMin(entry.fatte); }
+                    d.setDate(d.getDate() + 1);
+                }
+
+                const hhmm = minToHHMM(totMin);
+                const totDiv = document.createElement('div');
+                totDiv.className = 'giorno-wrapper row-tot-settimana';
+                totDiv.innerHTML = `
+                    <div class="giorno-row" style="background:#f1f3f5; border-top:1px solid #ccc; border-bottom:1px solid #ccc;">
+                        <span class="giorno-label" style="font-weight:bold;">TOT</span>
+                        <div class="giorno-previsto" style="font-size:0.8rem;">Sett. Completa</div>
+                        <div class="input-group-ore">
+                            <input class="giorno-input" value="${hhmm}" readonly style="font-weight:bold; color:#343a40; background:#e9ecef;">
+                            <button class="btn-clock" disabled style="opacity:0;">🕒</button>
+                        </div>
+                        <button class="btn-extra" disabled style="visibility:hidden;">+</button>
+                    </div>
+                `;
+                wrapper.after(totDiv);
+            }
+        });
+    }
+
+    function toggleAssenze(k) { const p=document.getElementById('panel_'+k); p.style.display=p.style.display==='block'?'none':'block'; }
     
-    for(let i = 1; i <= days; i++) {
-        let k = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-        let e = globalDB[k];
+    function gestisciInputAssenza(k) { 
+        const t=document.getElementById('sel_tipo_'+k).value, q=document.getElementById('inp_qty_'+k);
+        if(t==='Permesso') { q.readOnly=false; if(q.value==1) q.value=''; } else { q.readOnly=true; if(t) q.value=1; else q.value=''; }
+        salvaTutto(k);
+    }
+    
+    function confermaAssenza(k) { salvaTutto(k); document.getElementById('panel_'+k).style.display='none'; }
+    
+    function calcolaTotali() {
+        let tm = 0, tp = 0, tf = 0, tmal = 0; 
+        const days = new Date(currentYear, currentMonth + 1, 0).getDate();
         
-        if(e) {
-            // Somma ore lavorate
-            if(e.fatte) tm += hhmmToMin(e.fatte);
+        for(let i = 1; i <= days; i++) {
+            let k = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+            let e = globalDB[k];
             
-            // Somma giorni di ferie e malattia
-            if(e.assenzaTipo === 'Ferie') tf += parseFloat(e.assenzaQty) || 0;
-            if(e.assenzaTipo === 'Malattia') tmal += parseFloat(e.assenzaQty) || 0;
-            
-            // Somma permessi (Logica ant-NaN per supportare "1h", "1,5", "01:30")
-            if(e.assenzaTipo === 'Permesso') {
-                let val = String(e.assenzaQty || "0").toLowerCase().replace('h', '').trim();
-                
-                if (val.includes(':')) {
-                    const [h, m] = val.split(':');
-                    tp += (parseInt(h) || 0) * 60 + (parseInt(m) || 0);
-                } else {
-                    val = val.replace(',', '.'); // Supporta sia virgola che punto
-                    const num = parseFloat(val);
-                    if (!isNaN(num)) {
-                        tp += Math.round(num * 60); // Converte le ore decimali in minuti
+            if(e) {
+                if(e.fatte) tm += hhmmToMin(e.fatte);
+                if(e.assenzaTipo === 'Ferie') tf += parseFloat(e.assenzaQty) || 0;
+                if(e.assenzaTipo === 'Malattia') tmal += parseFloat(e.assenzaQty) || 0;
+                if(e.assenzaTipo === 'Permesso') {
+                    let val = String(e.assenzaQty || "0").toLowerCase().replace('h', '').trim();
+                    if (val.includes(':')) {
+                        const [h, m] = val.split(':');
+                        tp += (parseInt(h) || 0) * 60 + (parseInt(m) || 0);
+                    } else {
+                        val = val.replace(',', '.'); 
+                        const num = parseFloat(val);
+                        if (!isNaN(num)) { tp += Math.round(num * 60); }
                     }
                 }
             }
         }
-    }
-    
-    // Aggiorna la grafica nel footer
-    document.getElementById('totOre').innerText = minToHHMM(tm); 
-    document.getElementById('totPermessi').innerText = minToHHMM(tp) + "h";
-    document.getElementById('totFerie').innerText = tf + "g"; 
-    document.getElementById('totMalattia').innerText = tmal + "g";
-}
-
         
-        function apriTredicesima() { toggleMainTitle(false); document.getElementById('selezionePanel').style.display='none'; document.getElementById('bustaPanel').style.display='block'; document.getElementById('bustaMeseTitle').innerText=`(13ª ${currentYear})`; document.getElementById('bustaFeriePermessi').style.display='none'; const d = globalBuste[`${currentYear}_12`]||{}; document.getElementById('inp_stipendio').value=d.stipendio||''; }
-        function refreshTredicesimaStatus() { const d = globalBuste[`${document.getElementById('annoSelect').value}_12`]; const b = document.getElementById('btn13esima'); if(d?.stipendio) { b.classList.add('checked'); b.innerHTML=`✅ 13ª: ${formatMoney(d.stipendio)}`; } else { b.classList.remove('checked'); b.innerHTML=`🎁 13ª Mensilità`; } }
-        function checkBustaStatus() { if(currentMonth===12) return; const d = globalBuste[`${currentYear}_${currentMonth}`]; const b=document.getElementById('btnBustaMain'); if(d?.stipendio) { b.className="btn-busta busta-ok"; b.innerHTML=`✅ Busta: ${formatMoney(d.stipendio)}`; } else { b.className="btn-busta busta-missing"; b.innerHTML="💶 Inserisci Dati Busta Paga"; } }
-        window.apriBusta = function() { 
-    document.getElementById('schedaMese').style.display = 'none'; 
-    document.getElementById('bustaPanel').style.display = 'block'; 
-    document.getElementById('bustaMeseTitle').innerText = `(${nomiMesi[currentMonth]})`; 
-    document.getElementById('bustaFeriePermessi').style.display = 'block'; 
-    
-    const d = globalBuste[`${currentYear}_${currentMonth}`] || {}; 
-    document.getElementById('inp_stipendio').value = d.stipendio || ''; 
-    document.getElementById('inp_ferie_residue').value = d.ferie || ''; 
-    document.getElementById('inp_permessi_residue').value = d.permessi || ''; 
-    
-    // Richiamo le nuove funzioni per formattare i valori all'apertura del pannello
-    if (typeof window.calcolaFerieVisive === 'function') window.calcolaFerieVisive(d.ferie); 
-    if (typeof window.calcolaPermessiVisivi === 'function') window.calcolaPermessiVisivi(d.permessi); 
-};
-
-        async function salvaBusta() { 
-    const s = document.getElementById('inp_stipendio').value;
-    const f = document.getElementById('inp_ferie_residue').value;
-    const p = document.getElementById('inp_permessi_residue').value; 
-    
-    // Nota: currentMonth potrebbe essere 0 (Gennaio), quindi controlliamo se è undefined, non se è falsey
-    const meseKey = (currentMonth === undefined || currentMonth === null) ? 12 : currentMonth;
-    const k = `${currentYear}_${meseKey}`; 
-    
-    await saveBustaEntry(k, {stipendio:s, ferie:f, permessi:p});
-    
-    // Chiudi e torna al menu
-    alert("Dati Busta salvati!");
-    chiudiBusta(); 
-}
-
-        // Nuova conversione Permessi (es. 33 -> "33:00")
-window.calcolaPermessiVisivi = function(v) { 
-    let o = parseFloat(v) || 0; 
-    if (o > 0) {
-        let h = Math.floor(o);
-        let m = Math.round((o - h) * 60);
-        document.getElementById('out_permessi').innerText = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`; 
-    } else {
-        document.getElementById('out_permessi').innerText = "-";
-    }
-};
-
-// Nuova conversione Ferie (es. 5 -> "5 gg")
-window.calcolaFerieVisive = function(v) { 
-    let o = parseFloat(v) || 0; 
-    document.getElementById('out_ferie').innerText = o > 0 ? `${o} gg` : "-"; 
-};
-        
-        function apriConfig() { toggleMainTitle(false); document.getElementById('selezionePanel').style.display='none'; document.getElementById('configPanel').style.display='block'; document.getElementById('cfg_pausa').value=globalConfig.pausa||"00:00"; const c=document.getElementById('daysConfigWrapper'); c.innerHTML=''; [1,2,3,4,5,6,0].forEach(d=>{ c.innerHTML+=`<div class="config-row"><span>${giorniSett[d]}</span><input type="time" id="cfg_day_${d}" class="config-input" value="${globalConfig[d]||'00:00'}"></div>`; }); }
-        async function salvaConfig() { const n={}; [0,1,2,3,4,5,6].forEach(i=>n[i]=document.getElementById(`cfg_day_${i}`).value); n.pausa=document.getElementById('cfg_pausa').value; await saveConfigData(n); document.getElementById('configPanel').style.display='none'; document.getElementById('selezionePanel').style.display='block'; toggleMainTitle(true); }
-        
-		function chiudiConfig() {
-    // Nascondi la modale/pannello config
-    document.getElementById('configModal').style.display = 'none';
-    // Opzionale: Ricarica i dati per annullare eventuali modifiche non salvate
-    // syncAllData(); // Solo se vuoi "annullare" le modifiche fatte prima di premere Salva
-}
-		window.chiudiConfig = function() {
-    // 1. Nascondi Config
-    const pConfig = document.getElementById('configPanel');
-    if(pConfig) pConfig.style.display = 'none';
-
-    // 2. Mostra Menu Principale
-    const pSel = document.getElementById('selezionePanel');
-    if(pSel) pSel.style.display = 'block';
-
-    // 3. Ripristina titolo (se serve)
-    // const title = document.getElementById('mainTitle');
-    // if(title) title.style.display = 'block';
-
-    // Scroll in cima per pulizia
-    window.scrollTo(0,0);
-};
-
-		
-		
-		
-        function generaBottoniMesi() { const c=document.getElementById('mesiContainer'); c.innerHTML=''; const now=new Date(), ry=now.getFullYear(), rm=now.getMonth(), sy=parseInt(document.getElementById('annoSelect').value); nomiMesi.forEach((m,i)=>{ let b=document.createElement('button'); b.className='btn-mese'; if(sy<ry || (sy===ry && i<rm)) b.classList.add('btn-mese-concluso'); const d=globalBuste[`${sy}_${i}`]; let st='status-unpaid'; if(d?.stipendio) st='status-paid'; b.innerHTML=`${m}<span class="status-dot ${st}"></span>`; b.onclick=()=>apriMese(i); c.appendChild(b); }); }
-
-		window.apriMese = function(i) { 
-			toggleMainTitle(false); 
-			currentMonth = i; 
-			
-			document.getElementById('selezionePanel').style.display = 'none'; 
-			document.getElementById('schedaMese').style.display = 'block'; 
-			document.getElementById('footerTotali').style.display = 'flex'; 
-			document.getElementById('titoloMese').innerText = `${nomiMesi[i]} ${currentYear}`; 
-			
-			generGiorni(currentYear, i); 
-			calcolaTotali(); 
-			checkBustaStatus(); 
-
-			// --- NUOVO: SCROLL AUTOMATICO AL GIORNO DI OGGI ---
-			setTimeout(() => {
-				const today = new Date();
-				// Lo facciamo solo se stiamo aprendo il mese corrente dell'anno corrente
-				if(today.getMonth() === i && today.getFullYear() === currentYear) {
-					const y = today.getFullYear();
-					const m = String(today.getMonth() + 1).padStart(2, '0');
-					const d = String(today.getDate()).padStart(2, '0');
-					const oggiKey = `${y}-${m}-${d}`;
-					
-					// Cerchiamo l'elemento del giorno
-					const el = document.getElementById('input_fatte_' + oggiKey);
-					if(el) {
-						// Scrolliamo per metterlo al centro dello schermo
-						el.scrollIntoView({ behavior: "smooth", block: "center" });
-					}
-				}
-			}, 100); // Piccolo ritardo per assicurarsi che l'HTML sia pronto
-		};
-
-        function chiudiScheda() { toggleMainTitle(true); document.getElementById('schedaMese').style.display='none'; document.getElementById('footerTotali').style.display='none'; document.getElementById('selezionePanel').style.display='block'; refreshTredicesimaStatus(); generaBottoniMesi(); }
-        
-        function apriStats() { toggleMainTitle(false); document.getElementById('selezionePanel').style.display='none'; document.getElementById('statsPanel').style.display='block'; document.getElementById('statsAnno').value=currentYear; calcolaStats(); }
-        function chiudiStats() { toggleMainTitle(true); document.getElementById('statsPanel').style.display='none'; document.getElementById('selezionePanel').style.display='block'; }
-        
-		function calcolaStats() {
-    const a = document.getElementById('statsAnno').value;
-    const t = document.getElementById('statsTipo').value;
-    const l = document.getElementById('statsList');
-    const tb = document.getElementById('statsTotal');
-    
-    l.innerHTML = '';
-    let s = 0, c = 0;
-
-    // Funzione interna per leggere correttamente i permessi ("1h", "1.5", "01:30")
-    function parsePermesso(val) {
-        if (!val) return 0;
-        let v = String(val).toLowerCase().replace('h', '').trim();
-        
-        // Se è scritto "01:30"
-        if (v.includes(':')) {
-            const [h, m] = v.split(':');
-            return (parseInt(h) || 0) * 60 + (parseInt(m) || 0);
-        }
-        
-        // Se è scritto "1" o "1.5" o "1,5"
-        v = v.replace(',', '.');
-        const num = parseFloat(v);
-        if (!isNaN(num)) {
-            return Math.round(num * 60); // Trasforma le ore in minuti
-        }
-        return 0;
+        document.getElementById('totOre').innerText = minToHHMM(tm); 
+        document.getElementById('totPermessi').innerText = minToHHMM(tp) + "h";
+        document.getElementById('totFerie').innerText = tf + "g"; 
+        document.getElementById('totMalattia').innerText = tmal + "g";
     }
 
-    Object.keys(globalDB).sort().forEach(k => {
-        if (k.startsWith(a)) {
-            const e = globalDB[k];
-            if (e.assenzaTipo === t) {
-                let v = 0;
-                let vd = "";
-                
-                if (t === 'Permesso') {
-                    // Usa la nuova funzione per i permessi
-                    v = parsePermesso(e.assenzaQty); 
-                    vd = e.assenzaQty + (String(e.assenzaQty).toLowerCase().includes('h') ? '' : 'h');
-                } else {
-                    v = parseFloat(e.assenzaQty) || 0; 
-                    vd = v + (v > 1 ? 'gg' : 'g');
-                }
-                
-                s += v; 
-                c++; 
-                
-                const d = new Date(k);
-                l.innerHTML += `<li class="stats-item"><span>${d.toLocaleDateString('it-IT',{day:'numeric',month:'long'})}</span><b>${vd}</b></li>`;
-            }
-        }
-    });
-
-    if (c === 0) {
-        l.innerHTML = '<li style="text-align:center;padding:20px;">Nessun dato</li>';
-        tb.innerText = "Totale: 0";
-    } else {
-        tb.innerText = `Totale: ${t === 'Permesso' ? minToHHMM(s) + ' Ore' : s + ' Giorni'}`;
+    function apriTredicesima() { toggleMainTitle(false); document.getElementById('selezionePanel').style.display='none'; document.getElementById('bustaPanel').style.display='block'; document.getElementById('bustaMeseTitle').innerText=`(13ª ${currentYear})`; document.getElementById('bustaFeriePermessi').style.display='none'; const d = globalBuste[`${currentYear}_12`]||{}; document.getElementById('inp_stipendio').value=d.stipendio||''; }
+    function refreshTredicesimaStatus() { const d = globalBuste[`${document.getElementById('annoSelect').value}_12`]; const b = document.getElementById('btn13esima'); if(d?.stipendio) { b.classList.add('checked'); b.innerHTML=`✅ 13ª: ${formatMoney(d.stipendio)}`; } else { b.classList.remove('checked'); b.innerHTML=`🎁 13ª Mensilità`; } }
+    function checkBustaStatus() { if(currentMonth===12) return; const d = globalBuste[`${currentYear}_${currentMonth}`]; const b=document.getElementById('btnBustaMain'); if(d?.stipendio) { b.className="btn-busta busta-ok"; b.innerHTML=`✅ Busta: ${formatMoney(d.stipendio)}`; } else { b.className="btn-busta busta-missing"; b.innerHTML="💶 Inserisci Dati Busta Paga"; } }
+    
+    function apriBusta() { 
+        document.getElementById('schedaMese').style.display = 'none'; 
+        document.getElementById('bustaPanel').style.display = 'block'; 
+        document.getElementById('bustaMeseTitle').innerText = `(${nomiMesi[currentMonth]})`; 
+        document.getElementById('bustaFeriePermessi').style.display = 'block'; 
+        
+        const d = globalBuste[`${currentYear}_${currentMonth}`] || {}; 
+        document.getElementById('inp_stipendio').value = d.stipendio || ''; 
+        document.getElementById('inp_ferie_residue').value = d.ferie || ''; 
+        document.getElementById('inp_permessi_residue').value = d.permessi || ''; 
+        
+        calcolaFerieVisive(d.ferie); 
+        calcolaPermessiVisivi(d.permessi); 
     }
-}
-       window.chiudiBusta = function() { 
-    // Nascondi pannello busta
-    document.getElementById('bustaPanel').style.display = 'none'; 
-    
-    // Nascondi anche la scheda del mese (se fosse aperta sotto)
-    document.getElementById('schedaMese').style.display = 'none';
-    document.getElementById('footerTotali').style.display = 'none';
 
-    // Mostra SEMPRE il menu principale
-    toggleMainTitle(true); 
-    document.getElementById('selezionePanel').style.display = 'block'; 
-    
-    // Aggiorna i pallini e i bottoni
-    refreshTredicesimaStatus(); 
-    generaBottoniMesi(); 
-}
-
-
-// =========================================================
-//  GESTIONE UTILITÀ (EXPORT / IMPORT / DELETE)
-// =========================================================
-
-window.apriUtility = function() {
-    const d = new Date();
-    // Default: Dal 1 Gennaio a Oggi
-    document.getElementById('utilStart').value = `${d.getFullYear()}-01-01`;
-    document.getElementById('utilEnd').value = d.toISOString().split('T')[0];
-    document.getElementById('utilityModal').style.display = 'flex';
-};
-
-window.chiudiUtility = function() {
-    document.getElementById('utilityModal').style.display = 'none';
-};
-
-window.impostaTuttoAnno = function() {
-    const y = new Date().getFullYear();
-    document.getElementById('utilStart').value = `${y}-01-01`;
-    document.getElementById('utilEnd').value = `${y}-12-31`;
-};
-
-// --- 1. ESPORTAZIONE ---
-window.esportaDati = function() {
-    const start = document.getElementById('utilStart').value;
-    const end = document.getElementById('utilEnd').value;
-    if(!start || !end) { alert("Seleziona un intervallo date valido!"); return; }
-
-    console.log("Esportazione dal", start, "al", end);
-    
-    // Filtriamo i dati globalDB (Registro Ore)
-    const exportDB = {};
-    Object.keys(globalDB).forEach(key => {
-        if(key >= start && key <= end) {
-            exportDB[key] = globalDB[key];
-        }
-    });
-
-    // Filtriamo i dati globalBuste (Buste Paga) - Opzionale ma consigliato
-    // Le chiavi sono YYYY_M. Costruiamo una data fittizia per confrontare
-    const exportBuste = {};
-    Object.keys(globalBuste).forEach(key => {
-        const [y, m] = key.split('_');
-        // Creiamo una data "fine mese" per vedere se rientra
-        const dCheck = `${y}-${String(m).padStart(2,'0')}-01`;
-        if(dCheck >= start.substring(0,7) + "-01" && dCheck <= end) {
-            exportBuste[key] = globalBuste[key];
-        }
-    });
-
-    const exportData = {
-        tipo: "BACKUP_REGISTRO_ORE",
-        data_export: new Date().toISOString(),
-        autore: currentUser ? currentUser.email : "anonimo",
-        registro_ore: exportDB,
-        buste_paga: exportBuste,
-        config: globalConfig // Salviamo anche la config per sicurezza
-    };
-
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 2));
-    const downloadAnchorNode = document.createElement('a');
-    downloadAnchorNode.setAttribute("href", dataStr);
-    downloadAnchorNode.setAttribute("download", `backup_ore_${start}_${end}.json`);
-    document.body.appendChild(downloadAnchorNode);
-    downloadAnchorNode.click();
-    downloadAnchorNode.remove();
-};
-
-// --- 2. IMPORTAZIONE ---
-window.processaFileImport = function(input) {
-    const file = input.files[0];
-    if(!file) return;
-
-    const reader = new FileReader();
-    reader.onload = async function(e) {
+    async function salvaBusta() { 
         try {
-            const json = JSON.parse(e.target.result);
-            if(json.tipo !== "BACKUP_REGISTRO_ORE") {
-                if(!confirm("Attenzione: Questo file non sembra un backup di questa app. Vuoi provare comunque?")) return;
-            }
-
-            const numOre = Object.keys(json.registro_ore || {}).length;
-            const numBuste = Object.keys(json.buste_paga || {}).length;
-
-            if(!confirm(`Trovati:\n- ${numOre} Giorni lavorati\n- ${numBuste} Buste paga\n\nVuoi importarli nel Cloud? (Sovrascriverà i dati esistenti per quelle date)`)) return;
-
-            document.getElementById('loadingOverlay').style.display = 'flex'; // Mostra caricamento
-
-            // Importiamo Registro Ore
-            if(json.registro_ore) {
-                for (const [key, data] of Object.entries(json.registro_ore)) {
-                    await saveDBEntry(key, data); // Funzione che salva su Firebase
-                }
-            }
-
-            // Importiamo Buste
-            if(json.buste_paga) {
-                for (const [key, data] of Object.entries(json.buste_paga)) {
-                    await saveBustaEntry(key, data);
-                }
-            }
+            const s = document.getElementById('inp_stipendio').value;
+            const f = document.getElementById('inp_ferie_residue').value;
+            const p = document.getElementById('inp_permessi_residue').value; 
+            const meseKey = (typeof currentMonth === 'undefined' || currentMonth === null) ? 12 : currentMonth;
+            const k = `${currentYear}_${meseKey}`; 
             
-            // Importiamo Config (Opzionale, chiediamo?)
-            // await saveConfigData(json.config);
+            await saveBustaEntry(k, {stipendio:s, ferie:f, permessi:p});
+            alert("Dati salvati correttamente!");
+            chiudiBusta(); 
+        } catch(e) {
+            console.error("Errore salvataggio:", e);
+            alert("Errore salvataggio: " + e.message);
+        }
+    }
 
-            alert("Importazione Completata con Successo! ✅");
-            location.reload(); // Ricarica per vedere i nuovi dati
+    function chiudiBusta() { 
+        const pBusta = document.getElementById('bustaPanel');
+        const pMese = document.getElementById('schedaMese');
+        const pFooter = document.getElementById('footerTotali');
+        if(pBusta) pBusta.style.display = 'none';
+        if(pMese) pMese.style.display = 'none';
+        if(pFooter) pFooter.style.display = 'none';
 
-        } catch(err) {
-            console.error(err);
-            alert("Errore nella lettura del file: " + err.message);
+        const pSel = document.getElementById('selezionePanel');
+        if(pSel) pSel.style.display = 'block';
+        toggleMainTitle(true); 
+        
+        refreshTredicesimaStatus(); 
+        generaBottoniMesi(); 
+    }
+
+    function apriConfig() { toggleMainTitle(false); document.getElementById('selezionePanel').style.display='none'; document.getElementById('configPanel').style.display='block'; document.getElementById('cfg_pausa').value=globalConfig.pausa||"00:00"; const c=document.getElementById('daysConfigWrapper'); c.innerHTML=''; [1,2,3,4,5,6,0].forEach(d=>{ c.innerHTML+=`<div class="config-row"><span>${giorniSett[d]}</span><input type="time" id="cfg_day_${d}" class="config-input" value="${globalConfig[d]||'00:00'}"></div>`; }); }
+    async function salvaConfig() { const n={}; [0,1,2,3,4,5,6].forEach(i=>n[i]=document.getElementById(`cfg_day_${i}`).value); n.pausa=document.getElementById('cfg_pausa').value; await saveConfigData(n); document.getElementById('configPanel').style.display='none'; document.getElementById('selezionePanel').style.display='block'; toggleMainTitle(true); }
+    
+    function chiudiConfig() {
+        const pConfig = document.getElementById('configPanel');
+        if(pConfig) pConfig.style.display = 'none';
+        const pSel = document.getElementById('selezionePanel');
+        if(pSel) pSel.style.display = 'block';
+        window.scrollTo(0,0);
+    }
+
+    function generaBottoniMesi() { const c=document.getElementById('mesiContainer'); c.innerHTML=''; const now=new Date(), ry=now.getFullYear(), rm=now.getMonth(), sy=parseInt(document.getElementById('annoSelect').value); nomiMesi.forEach((m,i)=>{ let b=document.createElement('button'); b.className='btn-mese'; if(sy<ry || (sy===ry && i<rm)) b.classList.add('btn-mese-concluso'); const d=globalBuste[`${sy}_${i}`]; let st='status-unpaid'; if(d?.stipendio) st='status-paid'; b.innerHTML=`${m}<span class="status-dot ${st}"></span>`; b.onclick=()=>apriMese(i); c.appendChild(b); }); }
+
+    function apriMese(i) { 
+        toggleMainTitle(false); 
+        currentMonth = i; 
+        
+        document.getElementById('selezionePanel').style.display = 'none'; 
+        document.getElementById('schedaMese').style.display = 'block'; 
+        document.getElementById('footerTotali').style.display = 'flex'; 
+        document.getElementById('titoloMese').innerText = `${nomiMesi[i]} ${currentYear}`; 
+        
+        generGiorni(currentYear, i); 
+        calcolaTotali(); 
+        checkBustaStatus(); 
+
+        setTimeout(() => {
+            const today = new Date();
+            if(today.getMonth() === i && today.getFullYear() === currentYear) {
+                const y = today.getFullYear();
+                const m = String(today.getMonth() + 1).padStart(2, '0');
+                const d = String(today.getDate()).padStart(2, '0');
+                const oggiKey = `${y}-${m}-${d}`;
+                const el = document.getElementById('input_fatte_' + oggiKey);
+                if(el) { el.scrollIntoView({ behavior: "smooth", block: "center" }); }
+            }
+        }, 100); 
+    }
+
+    function chiudiScheda() { toggleMainTitle(true); document.getElementById('schedaMese').style.display='none'; document.getElementById('footerTotali').style.display='none'; document.getElementById('selezionePanel').style.display='block'; refreshTredicesimaStatus(); generaBottoniMesi(); }
+    function apriStats() { toggleMainTitle(false); document.getElementById('selezionePanel').style.display='none'; document.getElementById('statsPanel').style.display='block'; document.getElementById('statsAnno').value=currentYear; calcolaStats(); }
+    function chiudiStats() { toggleMainTitle(true); document.getElementById('statsPanel').style.display='none'; document.getElementById('selezionePanel').style.display='block'; }
+    
+    function calcolaStats() {
+        const a = document.getElementById('statsAnno').value;
+        const t = document.getElementById('statsTipo').value;
+        const l = document.getElementById('statsList');
+        const tb = document.getElementById('statsTotal');
+        
+        l.innerHTML = '';
+        let s = 0, c = 0;
+
+        function parsePermesso(val) {
+            if (!val) return 0;
+            let v = String(val).toLowerCase().replace('h', '').trim();
+            if (v.includes(':')) {
+                const [h, m] = v.split(':');
+                return (parseInt(h) || 0) * 60 + (parseInt(m) || 0);
+            }
+            v = v.replace(',', '.');
+            const num = parseFloat(v);
+            if (!isNaN(num)) { return Math.round(num * 60); }
+            return 0;
+        }
+
+        Object.keys(globalDB).sort().forEach(k => {
+            if (k.startsWith(a)) {
+                const e = globalDB[k];
+                if (e.assenzaTipo === t) {
+                    let v = 0; let vd = "";
+                    if (t === 'Permesso') {
+                        v = parsePermesso(e.assenzaQty); 
+                        vd = e.assenzaQty + (String(e.assenzaQty).toLowerCase().includes('h') ? '' : 'h');
+                    } else {
+                        v = parseFloat(e.assenzaQty) || 0; 
+                        vd = v + (v > 1 ? 'gg' : 'g');
+                    }
+                    s += v; c++; 
+                    const d = new Date(k);
+                    l.innerHTML += `<li class="stats-item"><span>${d.toLocaleDateString('it-IT',{day:'numeric',month:'long'})}</span><b>${vd}</b></li>`;
+                }
+            }
+        });
+
+        if (c === 0) {
+            l.innerHTML = '<li style="text-align:center;padding:20px;">Nessun dato</li>';
+            tb.innerText = "Totale: 0";
+        } else {
+            tb.innerText = `Totale: ${t === 'Permesso' ? minToHHMM(s) + ' Ore' : s + ' Giorni'}`;
+        }
+    }
+
+    // --- GESTIONE UTILITÀ ---
+    function apriUtility() {
+        const d = new Date();
+        document.getElementById('utilStart').value = `${d.getFullYear()}-01-01`;
+        document.getElementById('utilEnd').value = d.toISOString().split('T')[0];
+        document.getElementById('utilityModal').style.display = 'flex';
+    }
+
+    function chiudiUtility() { document.getElementById('utilityModal').style.display = 'none'; }
+    function impostaTuttoAnno() { const y = new Date().getFullYear(); document.getElementById('utilStart').value = `${y}-01-01`; document.getElementById('utilEnd').value = `${y}-12-31`; }
+
+    function esportaDati() {
+        const start = document.getElementById('utilStart').value;
+        const end = document.getElementById('utilEnd').value;
+        if(!start || !end) { alert("Seleziona un intervallo date valido!"); return; }
+
+        const exportDB = {};
+        Object.keys(globalDB).forEach(key => { if(key >= start && key <= end) { exportDB[key] = globalDB[key]; } });
+
+        const exportBuste = {};
+        Object.keys(globalBuste).forEach(key => {
+            const [y, m] = key.split('_');
+            const dCheck = `${y}-${String(m).padStart(2,'0')}-01`;
+            if(dCheck >= start.substring(0,7) + "-01" && dCheck <= end) { exportBuste[key] = globalBuste[key]; }
+        });
+
+        const exportData = {
+            tipo: "BACKUP_REGISTRO_ORE",
+            data_export: new Date().toISOString(),
+            autore: currentUser ? currentUser.email : "anonimo",
+            registro_ore: exportDB,
+            buste_paga: exportBuste,
+            config: globalConfig
+        };
+
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 2));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", `backup_ore_${start}_${end}.json`);
+        document.body.appendChild(downloadAnchorNode);
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+    }
+
+    function processaFileImport(input) {
+        const file = input.files[0];
+        if(!file) return;
+
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+            try {
+                const json = JSON.parse(e.target.result);
+                if(json.tipo !== "BACKUP_REGISTRO_ORE") {
+                    if(!confirm("Attenzione: Questo file non sembra un backup di questa app. Vuoi provare comunque?")) return;
+                }
+                const numOre = Object.keys(json.registro_ore || {}).length;
+                const numBuste = Object.keys(json.buste_paga || {}).length;
+
+                if(!confirm(`Trovati:\n- ${numOre} Giorni lavorati\n- ${numBuste} Buste paga\n\nVuoi importarli nel Cloud? (Sovrascriverà i dati esistenti per quelle date)`)) return;
+
+                document.getElementById('loadingOverlay').style.display = 'flex';
+                if(json.registro_ore) { for (const [key, data] of Object.entries(json.registro_ore)) { await saveDBEntry(key, data); } }
+                if(json.buste_paga) { for (const [key, data] of Object.entries(json.buste_paga)) { await saveBustaEntry(key, data); } }
+
+                alert("Importazione Completata con Successo! ✅");
+                location.reload();
+            } catch(err) {
+                console.error(err);
+                alert("Errore nella lettura del file: " + err.message);
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }
+        };
+        reader.readAsText(file);
+        input.value = '';
+    }
+
+    async function eliminaDatiPeriodo() {
+        const start = document.getElementById('utilStart').value;
+        const end = document.getElementById('utilEnd').value;
+        if(!start || !end) { alert("Seleziona un intervallo date valido!"); return; }
+
+        if(!confirm(`⚠️ ATTENZIONE ESTREMA ⚠️\n\nStai per CANCELLARE PER SEMPRE tutti i dati dal ${start} al ${end}.\n\nL'operazione NON è annullabile.\n\nSei sicuro al 100%?`)) return;
+
+        const code = Math.floor(Math.random() * 9000) + 1000;
+        const check = prompt(`Per confermare la cancellazione, scrivi questo codice: ${code}`);
+        if(check != code) { alert("Codice errato. Operazione annullata."); return; }
+
+        document.getElementById('loadingOverlay').style.display = 'flex';
+        try {
+            let count = 0;
+            const keysToDelete = Object.keys(globalDB).filter(k => k >= start && k <= end);
+            for(const k of keysToDelete) { await deleteDBEntry(k); count++; }
+            alert(`Operazione completata.\nEliminati ${count} giorni dal database.`);
+            location.reload();
+        } catch(e) {
+            console.error(e);
+            alert("Errore durante l'eliminazione: " + e.message);
             document.getElementById('loadingOverlay').style.display = 'none';
         }
-    };
-    reader.readAsText(file);
-    // Reset input per poter ricaricare lo stesso file se serve
-    input.value = '';
-};
-
-// --- 3. ELIMINAZIONE MASSIVA ---
-window.eliminaDatiPeriodo = async function() {
-    const start = document.getElementById('utilStart').value;
-    const end = document.getElementById('utilEnd').value;
-    if(!start || !end) { alert("Seleziona un intervallo date valido!"); return; }
-
-    if(!confirm(`⚠️ ATTENZIONE ESTREMA ⚠️\n\nStai per CANCELLARE PER SEMPRE tutti i dati dal ${start} al ${end}.\n\nL'operazione NON è annullabile.\n\nSei sicuro al 100%?`)) return;
-
-    // Doppio controllo di sicurezza
-    const code = Math.floor(Math.random() * 9000) + 1000;
-    const check = prompt(`Per confermare la cancellazione, scrivi questo codice: ${code}`);
-    if(check != code) { alert("Codice errato. Operazione annullata."); return; }
-
-    document.getElementById('loadingOverlay').style.display = 'flex';
-
-    try {
-        let count = 0;
-        // Cancella Registro Ore
-        // Nota: Firebase non permette query di cancellazione di massa native lato client.
-        // Dobbiamo scorrere le chiavi locali (globalDB) e cancellare quelle che matchano.
-        // È più sicuro perché cancelliamo solo ciò che vediamo.
-        
-        // Per sicurezza ricarichiamo tutto prima? No, usiamo globalDB che è syncato.
-        const keysToDelete = Object.keys(globalDB).filter(k => k >= start && k <= end);
-        
-        for(const k of keysToDelete) {
-            await deleteDBEntry(k);
-            count++;
-        }
-
-        alert(`Operazione completata.\nEliminati ${count} giorni dal database.`);
-        location.reload();
-
-    } catch(e) {
-        console.error(e);
-        alert("Errore durante l'eliminazione: " + e.message);
-        document.getElementById('loadingOverlay').style.display = 'none';
     }
-};
 
+    // =========================================================
+    //  ESPORTAZIONI GLOBALI (API PER L'HTML)
+    // =========================================================
+    window.logoutApp = logoutApp;
+    window.salvaConfig = salvaConfig; 
+    window.chiudiConfig = chiudiConfig;
+    window.apriConfig = apriConfig; 
+    
+    window.apriBusta = apriBusta; 
+    window.salvaBusta = salvaBusta; 
+    window.chiudiBusta = chiudiBusta;
+    window.calcolaFerieVisive = calcolaFerieVisive; 
+    window.calcolaPermessiVisivi = calcolaPermessiVisivi;
+    
+    window.mostraRiepilogoStipendi = mostraRiepilogoStipendi; 
+    window.chiudiRiepilogoStipendi = chiudiRiepilogoStipendi;
+    window.apriTredicesima = apriTredicesima; 
+    
+    window.apriStats = apriStats; 
+    window.chiudiStats = chiudiStats;
+    window.calcolaStats = calcolaStats; 
+    window.gestisciAnnoMain = gestisciAnnoMain; 
+    window.gestisciAnnoStats = gestisciAnnoStats;
+    
+    window.apriMese = apriMese;
+    window.chiudiScheda = chiudiScheda;
+    
+    window.apriModalTime = apriModalTime; 
+    window.chiudiModalTime = chiudiModalTime; 
+    window.updateSummary = updateSummary;
+    window.setNow = setNow; 
+    window.salvaTimbratura = salvaTimbratura; 
+    window.salvaTutto = salvaTutto;
+    
+    window.toggleAssenze = toggleAssenze; 
+    window.gestisciInputAssenza = gestisciInputAssenza; 
+    window.confermaAssenza = confermaAssenza;
+    
+    window.apriUtility = apriUtility;
+    window.chiudiUtility = chiudiUtility;
+    window.impostaTuttoAnno = impostaTuttoAnno;
+    window.esportaDati = esportaDati;
+    window.processaFileImport = processaFileImport;
+    window.eliminaDatiPeriodo = eliminaDatiPeriodo;
 
+</script>
 
-// =========================================================
-//  FUNZIONI GLOBALI (Da mettere alla FINE dello script)
-// =========================================================
-
-// Funzione Chiudi Busta (Aggiornata e sicura)
-window.chiudiBusta = function() { 
-    console.log("Eseguo chiudiBusta...");
-    const pBusta = document.getElementById('bustaPanel');
-    const pMese = document.getElementById('schedaMese');
-    const pFooter = document.getElementById('footerTotali');
-
-    if(pBusta) pBusta.style.display = 'none';
-    if(pMese) pMese.style.display = 'none';
-    if(pFooter) pFooter.style.display = 'none';
-
-    // Torna alla Home
-    const pSel = document.getElementById('selezionePanel');
-    if(pSel) pSel.style.display = 'block';
-
-    const mainT = document.getElementById('mainTitle');
-    if(mainT) mainT.style.display = 'block';
-
-    // Aggiorna UI
-    if(typeof refreshTredicesimaStatus === 'function') refreshTredicesimaStatus();
-    if(typeof generaBottoniMesi === 'function') generaBottoniMesi();
-};
-
-// Funzione Salva Busta (Aggiornata e sicura)
-window.salvaBusta = async function() { 
-    console.log("Eseguo salvaBusta...");
-    try {
-        const s = document.getElementById('inp_stipendio').value;
-        const f = document.getElementById('inp_ferie_residue').value;
-        const p = document.getElementById('inp_permessi_residue').value; 
-        
-        const meseKey = (typeof currentMonth === 'undefined' || currentMonth === null) ? 12 : currentMonth;
-        const k = `${currentYear}_${meseKey}`; 
-        
-        await saveBustaEntry(k, {stipendio:s, ferie:f, permessi:p});
-        
-        alert("Dati salvati correttamente!");
-        window.chiudiBusta(); // Chiama la funzione appena definita sopra
-        
-    } catch(e) {
-        console.error("Errore salvataggio:", e);
-        alert("Errore salvataggio: " + e.message);
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./service-worker.js')
+                .then(registration => {
+                    console.log('ServiceWorker registrato con successo:', registration.scope);
+                })
+                .catch(err => {
+                    console.log('Fallita registrazione ServiceWorker:', err);
+                });
+        });
     }
-};
-
-// Assicuriamoci che anche le altre siano globali (se servono da HTML)
-window.apriBusta = apriBusta; 
-// ... aggiungi qui altre funzioni se necessario ...
-
-console.log("Funzioni globali definite correttamente.");
-
-
-
-
-    </script>
-	
-	    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./service-worker.js')
-                    .then(registration => {
-                        console.log('ServiceWorker registrato con successo:', registration.scope);
-                    })
-                    .catch(err => {
-                        console.log('Fallita registrazione ServiceWorker:', err);
-                    });
-            });
-        }
-		
-				// Definizione sicura di apriMese
-		function apriMeseLocale(i) { 
-			toggleMainTitle(false); 
-			currentMonth = i; 
-			
-			document.getElementById('selezionePanel').style.display = 'none'; 
-			document.getElementById('schedaMese').style.display = 'block'; 
-			document.getElementById('footerTotali').style.display = 'flex'; 
-			document.getElementById('titoloMese').innerText = `${nomiMesi[i]} ${currentYear}`; 
-			
-			generGiorni(currentYear, i); 
-			calcolaTotali(); 
-			checkBustaStatus(); 
-
-			// Scroll al giorno di oggi
-			setTimeout(() => {
-				const today = new Date();
-				if(today.getMonth() === i && today.getFullYear() === currentYear) {
-					const y = today.getFullYear();
-					const m = String(today.getMonth() + 1).padStart(2, '0');
-					const d = String(today.getDate()).padStart(2, '0');
-					const oggiKey = `${y}-${m}-${d}`;
-					const el = document.getElementById('input_fatte_' + oggiKey);
-					if(el) el.scrollIntoView({ behavior: "smooth", block: "center" });
-				}
-			}, 100);
-		}
-
-		// Rendiamola disponibile sia dentro che fuori
-		window.apriMese = apriMeseLocale;
-
-    </script>
+</script>
 </body>
 </html>
